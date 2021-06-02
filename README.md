@@ -1,5 +1,5 @@
 # EOS-Crystal-Interface
-In the project directory, you can run:
+In the project directory, you can run these in the terminal:
 
 ### `npm install` 
 
