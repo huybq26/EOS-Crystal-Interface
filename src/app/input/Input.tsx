@@ -11,13 +11,7 @@ import { InputStyles } from './Input.styles';
 import UploadFile from './UploadFile';
 import ConfirmData from './ConfirmData';
 import { excelToJson } from '../../utils/ExcelToJson';
-
-const crystalNameInput = 'crystalName';
-const mineralNameInput = 'mineralName';
-const volcanoNameInput = 'volcanoName';
-const eruptionYearInput = 'eruptionYear';
-const referenceInput = 'referenceInput';
-const typeOfCrystalInput = false; // to be modified
+import Fade from '@material-ui/core/Fade';
 
 const steps = ['Upload File', 'Confirm Data'];
 
@@ -26,16 +20,33 @@ export default function Input() {
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [excelFile, setExcelFile] = React.useState<File | null>(null);
+  const [excelFile1, setExcelFile1] = React.useState<File | null>(null);
   const [jsonData, setJsonData] = React.useState<any>({
-    "crystal name": "",
-    "type traverse": "",
-    "axis": "",
-    "orientation": "",
-    "mineral": "",
-    "volcano": "",
-    "eruption": "",
-    "reference": "",
-    "traverse": [],
+    'crystal name': '',
+    'type traverse': '',
+    axis: '',
+    orientation: '',
+    mineral: '',
+    volcano: '',
+    eruption: '',
+    reference: '',
+    //author: '',
+    //doi: '',
+    traverse: [],
+  });
+
+  const [jsonData2, setJsonData2] = React.useState<any>({
+    'crystal name': '',
+    'type traverse': '',
+    axis: '',
+    orientation: '',
+    mineral: '',
+    volcano: '',
+    eruption: '',
+    reference: '',
+    //author: '',
+    //doi: '',
+    traverse: [],
   });
 
   const onExcelFileChange = (newFile: File | null): void => {
@@ -46,6 +57,24 @@ export default function Input() {
       });
     }
   };
+
+  const onExcelFileChange1 = (newFile: File | null): void => {
+    setExcelFile1(newFile);
+    if (newFile) {
+      excelToJson(newFile).then((data) => {
+        setJsonData2({ ...data });
+      });
+    }
+  };
+
+  // const onExcelFileChange = (newFile: File | null): void => {
+  //   setExcelFile(newFile);
+  //   if (newFile) {
+  //     excelToJson(newFile).then((data) => {
+  //       setJsonData({ ...data });
+  //     });
+  //   }
+  // };
 
   const handleNext = (): void => {
     setActiveStep(activeStep + 1);
@@ -83,13 +112,21 @@ export default function Input() {
             step={0}
             activeStep={activeStep}
             excelFile={excelFile}
+            excelFile1={excelFile1}
             excelFileChange={onExcelFileChange}
+            excelFileChange1={onExcelFileChange1}
           />
           <ConfirmData
             step={1}
             activeStep={activeStep}
             jsonData={jsonData}
             setJsonData={setJsonData}
+          />
+          <ConfirmData
+            step={2}
+            activeStep={activeStep}
+            jsonData={jsonData2}
+            setJsonData={setJsonData2}
           />
         </div>
         <div className={classes.buttons}>
