@@ -28,30 +28,23 @@ const useStyles = makeStyles({
 type UploadFileProps = {
   step: number;
   activeStep: number;
-  excelFile: File | null;
-  excelFile1: File | null;
+  // excelFile: File | null;
+  // excelFile1: File | null;
+  excelFileList: FileList | null;
   // numOfFiles: number;
-  excelFileChange: (excelFile: File | null) => any;
-  excelFileChange1: (excelFile1: File | null) => any;
+  // excelFileChange: (excelFile: File | null) => any;
+  // excelFileChange1: (excelFile1: File | null) => any;
+  excelFileChangeList: (excelFileList: FileList | null) => any;
 };
 
 export default function UploadFile(props: UploadFileProps) {
   const classes = useStyles();
-  const { step, activeStep, excelFile } = props;
+  const { step, activeStep, excelFileList } = props;
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    // if (files) {
-    //   Array.from(files).forEach((file) => {
-    //     props.excelFileChange(file);
-    //     //console.log('Do something with ' + file.name);
-    //   });
-    // }
-    if (files && files[1]) {
-      props.excelFileChange(files[0]);
-      if (files[1]) {
-        props.excelFileChange1(files[1]);
-      }
+    if (files) {
+      props.excelFileChangeList(files);
     }
 
     //console.log(e.target.files.length);
@@ -63,7 +56,7 @@ export default function UploadFile(props: UploadFileProps) {
     //   props.excelFileChange(e.target.files[0]);
     // }
   };
-  console.log(excelFile);
+  // console.log(excelFile);
 
   return (
     <div
@@ -88,14 +81,10 @@ export default function UploadFile(props: UploadFileProps) {
         </Typography> */}
       </Box>
       <Typography className={classes.fileName} component={'p'}>
-        {excelFile != null ? (
+        {excelFileList != null ? (
           // excelFile.name
           <Typography>
-            Erebus_1997_anorthoclase_Moussallam2015_1_incomplete.xlsx
-            <br></br>
-            Erebus_1997_anorthoclase_Moussallam2015_1_incomplete(1).xlsx
-            <br></br>
-            Erebus_1997_anorthoclase_Moussallam2015_1_incomplete(2).xlsx
+            List of file names to insert
           </Typography>
         ) : (
           <Typography>
