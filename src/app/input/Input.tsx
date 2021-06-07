@@ -21,6 +21,8 @@ export default function Input() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [excelFile, setExcelFile] = React.useState<File | null>(null);
   const [excelFile1, setExcelFile1] = React.useState<File | null>(null);
+  const [excelFileList, setExcelFileList] =
+    React.useState<FileList | null>(null);
   const [jsonData, setJsonData] = React.useState<any>({
     'crystal name': '',
     'type traverse': '',
@@ -48,6 +50,35 @@ export default function Input() {
     //doi: '',
     traverse: [],
   });
+  let sampleObject = {
+    'crystal name': '',
+    'type traverse': '',
+    axis: '',
+    orientation: '',
+    mineral: '',
+    volcano: '',
+    eruption: '',
+    reference: '',
+    //author: '',
+    //doi: '',
+    traverse: [],
+  };
+  const [jsonDataList, setJsonDataList] = React.useState<any>([
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+    sampleObject,
+  ]);
 
   const onExcelFileChange = (newFile: File | null): void => {
     setExcelFile(newFile);
@@ -67,14 +98,21 @@ export default function Input() {
     }
   };
 
-  // const onExcelFileChange = (newFile: File | null): void => {
-  //   setExcelFile(newFile);
-  //   if (newFile) {
-  //     excelToJson(newFile).then((data) => {
-  //       setJsonData({ ...data });
-  //     });
-  //   }
-  // };
+  const onExcelFileChangeList = async (newFiles: FileList | null) => {
+    setExcelFileList(newFiles);
+    if (newFiles) {
+      console.log('There are', newFiles.length, 'files');
+      for (let i = 0; i < newFiles.length; i++) {
+        let file = newFiles[i];
+
+        console.log('Processing file ', file.name);
+        await excelToJson(file).then((data) => {
+          jsonDataList.unshift(data);
+        });
+      }
+    }
+    console.log('The desired item is: ', jsonDataList);
+  };
 
   const handleNext = (): void => {
     setActiveStep(activeStep + 1);
@@ -85,7 +123,7 @@ export default function Input() {
   };
 
   const disableNext = (): boolean => {
-    if (activeStep == 0 && excelFile == null) {
+    if (activeStep == 0 && excelFileList == null) {
       return true;
     }
 
@@ -110,24 +148,29 @@ export default function Input() {
         <div style={{ position: 'relative' }}>
           <UploadFile
             step={0}
-            activeStep={activeStep}
-            excelFile={excelFile}
-            excelFile1={excelFile1}
-            excelFileChange={onExcelFileChange}
-            excelFileChange1={onExcelFileChange1}
+            activeStep={activeStep}    
+            excelFileList={excelFileList}
+            excelFileChangeList={onExcelFileChangeList}
           />
           <ConfirmData
             step={1}
+            setJsonData={setJsonDataList}
+            jsonData={jsonDataList[0]}
             activeStep={activeStep}
-            jsonData={jsonData}
-            setJsonData={setJsonData}
           />
           <ConfirmData
             step={2}
+            setJsonData={setJsonDataList}
             activeStep={activeStep}
-            jsonData={jsonData2}
-            setJsonData={setJsonData2}
+            jsonData={jsonDataList[1]}
           />
+          <ConfirmData
+            step={3}
+            setJsonData={setJsonDataList}
+            activeStep={activeStep}
+            jsonData={jsonDataList[2]}
+          />
+         
         </div>
         <div className={classes.buttons}>
           {activeStep !== 0 && (
