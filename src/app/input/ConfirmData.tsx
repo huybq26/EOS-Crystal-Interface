@@ -48,6 +48,7 @@ export default function ConfirmData(props: ConfirmDataProps) {
     checkedA: true,
     checkedB: false,
     checkedC: false,
+    checkedD: false,
   });
   const [crystalNameInput, setCrystalName] = React.useState('');
   const [mineralNameInput, setMineralNameInput] = React.useState('');
@@ -154,7 +155,7 @@ export default function ConfirmData(props: ConfirmDataProps) {
                     color='primary'
                   />
                 }
-                label='R-to-R'
+                label='Rim-to-Rim'
               />
               <FormControlLabel
                 control={
@@ -165,7 +166,7 @@ export default function ConfirmData(props: ConfirmDataProps) {
                     color='primary'
                   />
                 }
-                label='R-to-C'
+                label='Rim-to-Core'
               />
               <FormControlLabel
                 control={
@@ -176,7 +177,18 @@ export default function ConfirmData(props: ConfirmDataProps) {
                     color='primary'
                   />
                 }
-                label='C-to-C'
+                label='Rim only'
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={state.checkedD}
+                    onChange={handleCheckBoxChange}
+                    name='checkedC'
+                    color='primary'
+                  />
+                }
+                label='Unknown'
               />
             </FormGroup>
           </Grid>
