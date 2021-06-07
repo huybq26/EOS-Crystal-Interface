@@ -42,7 +42,7 @@ type ConfirmDataProps = {
 
 export default function ConfirmData(props: ConfirmDataProps) {
   const { step, activeStep, jsonData } = props;
-
+  console.log(jsonData);
   const classes = useStyles();
   const [state, setState] = React.useState({
     checkedA: true,
@@ -82,7 +82,7 @@ export default function ConfirmData(props: ConfirmDataProps) {
     } else if (name === 'referenceInput') {
       props.setJsonData({ ...jsonData, reference: value });
       setReferenceInput(value);
-    } else if (name === 'authorInput') {
+    } else if (name === 'researchTitle') {
       props.setJsonData({ ...jsonData, author: value });
       setAuthor(value);
     } else if (name === 'doiInput') {
