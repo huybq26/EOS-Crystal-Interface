@@ -46,13 +46,6 @@ function Search() {
     };
     fetchData();
   };
-  useEffect(() => { }, []);
-  console.log(searchData)
-  if (searchData.length > 0) {
-    console.log(searchData[0]["crystal name"])
-  }
-  
-
 
   return (
     <Paper>
@@ -95,7 +88,6 @@ function Search() {
       <Typography style ={{marginLeft: 25, paddingBottom : 20}}>
         {searchData.length != 0 ? (
           <Typography>
-            {/* <ul>{items}</ul> */}
             <Typography
         component='h3'
         variant='h5'
@@ -104,12 +96,12 @@ function Search() {
       >
         Search result
       </Typography>
-            <div>{searchData.map(person => <div key={person.name}>
+            <div>{searchData.map(data => <div key={data.name}>
               <ul>
-                <li>Crystal name: {person["crystal name"]}</li>
-                <li>Type traverse: {person["type traverse"]}</li>
-                <li>Mineral name: {person["mineral"]}</li>
-                <li>Eruption year: {person["eruption"]}</li>
+                <li>Crystal name: {data["crystal name"]}</li>
+                <li>Type traverse: {data["type traverse"]}</li>
+                <li>Mineral name: {data["mineral"]}</li>
+                <li>Eruption year: {data["eruption"]}</li>
               </ul>
               
             </div>)}</div>
