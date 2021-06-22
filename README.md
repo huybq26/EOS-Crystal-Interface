@@ -1,6 +1,9 @@
 # EOS-Crystal-Interface
 
-Please make sure you have connected to EOS MongoDB database in localhost. Change the port in server/src/db/mongoose.js to the one you are using. The current port is 41569.
+Please make sure you have connected to EOS MongoDB database in localhost. 
+
+Change the port in server/src/db/mongoose.js to the one you are using. The current port is 41569 (mongodb://127.0.0.1:41569/eos).
+
 In the project directory, you need to open two terminals and run these lines of code:
 
 Terminal 1: (server)
