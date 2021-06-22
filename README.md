@@ -9,7 +9,7 @@ In the project directory, you need to open two terminals and run these lines of 
 Terminal 1: (server)
 ### `cd server` 
 ### `npm install` 
-### `nodemon src/index.js`
+### `node src/index.js`
 The server will run in port 5000 (http://localhost:5000)
 
 Terminal 2: (frontend)
