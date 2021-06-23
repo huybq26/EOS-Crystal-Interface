@@ -8,13 +8,13 @@ In the project directory, you need to open two terminals and run these lines of 
 
 Terminal 1: (server)
 ### `cd server` 
-### `npm install` 
-### `node src/index.js`
+### `npm install` (just need to run in the first time)
+### `npm start`
 The server will run in port 5000 (http://localhost:5000)
 
 Terminal 2: (frontend)
 ### `cd frontend` 
-### `npm install` 
+### `npm install` (just need to run in the first time)
 ### `npm start`
 
 To run the app in the development mode.\
