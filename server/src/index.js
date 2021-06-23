@@ -34,21 +34,18 @@ app.get('/crystals/:id', async (req, res) => {
 });
 
 app.get('/search', async (req, res) => {
-  if (req.query.name) {
-    const crystal_name = req.query.name;
-  }
-  //   const type_traverse = req.query.traverse;
-  //   const axis = req.query.axis;
-  //   const orientation = req.query.orientation;
-  //   const mineral = req.query.mineral;
-  const volcano = req.query.volcano;
-  const eruption = req.query.eruption;
+  const keyword = req.query.single;
   try {
     const crystal = await Crystal.find({
-      // 'crystal name': crystal_name,
-      //   mineral: mineral,
-      volcano: volcano,
-      eruption: eruption,
+      $or:
+        [ { 'crystal name': { $regex: keyword, $options: 'i' } },
+          { mineral: { $regex: keyword, $options: 'i' } },
+          { volcano: { $regex: keyword, $options: 'i' } },
+          { eruption: { $regex: keyword, $options: 'i' } },
+          { mineral: { $regex: keyword, $options: 'i' } },
+          { 'type traverse': { $regex: keyword, $options: 'i' } },
+          { orientation: { $regex: keyword, $options: 'i' } },
+        ]
     });
     if (!crystal) {
       res.status(400).send();
@@ -58,6 +55,8 @@ app.get('/search', async (req, res) => {
     res.status(500).send(e);
   }
 });
+
+app.get('/search')
 
 app.post('/crystals', async (req, res) => {
   const newCrystal = new Crystal(req.body);
