@@ -32,7 +32,7 @@ function Search() {
     setSubmitText(value);
     console.log(textInput);
 
-    const url = '/search?' + textInput.toString();
+    const url = '/search?q=' + textInput.toString();
 
     const fetchData = async () => {
       try {
