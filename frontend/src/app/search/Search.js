@@ -6,12 +6,20 @@ import {
   TextField,
   Divider,
   Typography,
+  TableContainer,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  TablePagination,
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
 import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 
 function Search() {
   const classes = useStyles();
@@ -20,6 +28,9 @@ function Search() {
   const [submitText, setSubmitText] = useState('');
   const [searchData, setSearchData] = useState([]);
   const [buttonClicked, setButtonClicked] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchForText, setSearchForText] = useState('');
   const handleChange = (event) => {
     const value = event.target.value;
     setTextInput(value);
@@ -28,9 +39,10 @@ function Search() {
 
   const handleSubmit = (event) => {
     const value = event.target.value;
-    setButtonClicked(true);
     event.preventDefault();
     setSubmitText(value);
+    setSearchForText(textInput);
+    setButtonClicked(true);
     console.log(textInput);
 
     let arraySearch = [];
@@ -39,11 +51,15 @@ function Search() {
     if (textInput.includes(' and ')) {
       arraySearch = textInput.split(' and ');
       multipleInput = arraySearch.join('&');
-      console.log(multipleInput);
+      console.log('array search is: ' + arraySearch);
+    } else {
+      arraySearch[0] = textInput;
     }
     let url =
-      '/search?q=' +
-      arraySearch[0].toString().split(' ').join('+') +
+      '/search' +
+      (arraySearch[0]
+        ? '?q=' + arraySearch[0].toString().split(' ').join('+')
+        : '') +
       (arraySearch[1]
         ? '&q2=' + arraySearch[1].toString().split(' ').join('+')
         : '') +
@@ -60,7 +76,6 @@ function Search() {
     // if (multipleInput != '') {
     //   url = '/search?q=' + multipleInput.toString().split(' ').join('+');
     // }
-    // console.log(url);
 
     const fetchData = async () => {
       try {
@@ -68,6 +83,8 @@ function Search() {
         const json = await result.json();
         setSearchData(json);
         jsonList = json;
+        setButtonClicked(false);
+        console.log(url);
       } catch (e) {
         console.log(e);
       }
@@ -83,17 +100,77 @@ function Search() {
     return '';
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const StyledTableCell = withStyles((theme) => ({
+    head: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    body: {
+      fontSize: 16,
+    },
+  }))(TableCell);
+
+  const StyledTableRow = withStyles((theme) => ({
+    root: {
+      '&:nth-of-type(even)': {
+        backgroundColor: theme.palette.action.hover,
+      },
+    },
+  }))(TableRow);
+
+  const columns = [
+    { id: 'crystal name', label: 'Crystal Name', minWidth: 200, align: 'left' },
+    {
+      id: 'type traverse',
+      label: 'Type Traverse',
+      minWidth: 120,
+      align: 'left',
+    },
+    { id: 'mineral', label: 'Mineral', minWidth: 120, align: 'left' },
+    { id: 'volcano', label: 'Volcano', minWidth: 120, align: 'left' },
+    { id: 'eruption', label: 'Eruption', minWidth: 120, align: 'left' },
+  ];
+
   return (
     <Paper>
       <Typography
         component='h1'
         variant='h5'
         align='center'
-        style={{ paddingTop: 20, paddingBottom: 10 }}
+        style={{ paddingTop: 30, paddingBottom: 10 }}
       >
         Search in Crystal Database
       </Typography>
-      <IconButton aria-label='menu' style={{ marginLeft: 30 }}>
+      <hr
+        style={{
+          marginLeft: 25,
+          marginRight: 25,
+          color: '#168780',
+        }}
+      ></hr>
+      <Typography
+        style={{
+          paddingLeft: 45,
+          fontSize: 17,
+          marginTop: 10,
+          color: '#168780',
+          marginBottom: 5,
+        }}
+      >
+        <i>
+          Please search with keywords seperated by "and", e.g. Erebus and 1997:
+        </i>
+      </Typography>
+      <IconButton aria-label='menu' style={{ marginLeft: 60, marginTop: 10 }}>
         <MenuIcon />
       </IconButton>
       <TextField
@@ -111,13 +188,7 @@ function Search() {
         <SearchIcon />
       </IconButton>
       <Divider orientation='vertical' />
-      <br></br>
-      <Typography style={{ paddingLeft: 30, fontSize: 15 }}>
-        <i>
-          Please search with keywords seperated by "and".<br></br>
-          E.g. Erebus and 1997
-        </i>
-      </Typography>
+
       <br></br>
 
       <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
@@ -130,24 +201,105 @@ function Search() {
               align='center'
               style={{ paddingBottom: 10 }}
             >
-              Search result
+              Search results for "{searchForText}":
             </Typography>
-            <div>
-              {searchData.map((data) => (
-                <div key={data.name}>
-                  <ul>
-                    <li>Crystal name: {data['crystal name']}</li>
-                    <li>Type traverse: {data['type traverse']}</li>
-                    <li>Mineral name: {data['mineral']}</li>
-                    <li>Eruption year: {data['eruption']}</li>
-                  </ul>
-                </div>
-              ))}
-            </div>
+            <TableContainer className={classes.tableContainer}>
+              <Table stickyHeader aria-label='sticky table'>
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => {
+                      return (
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={{
+                            minWidth: column.minWidth,
+                            fontWeight: 'bold',
+                            borderColor: 'green',
+                            borderBottomWidth: 3,
+                          }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {searchData
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => {
+                      return (
+                        <StyledTableRow
+                          hover
+                          role='checkbox'
+                          tabIndex={-1}
+                          key={row.name}
+                        >
+                          {columns.map((column) => {
+                            const value = row[column.id];
+                            return (
+                              <StyledTableCell
+                                key={column.id}
+                                align={column.align}
+                              >
+                                {column.format && typeof value === 'number'
+                                  ? column.format(value)
+                                  : value}
+                              </StyledTableCell>
+                            );
+                          })}
+                        </StyledTableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 100]}
+              component='div'
+              count={searchData.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
           </Typography>
         ) : (
           // 'No result found.'
-          <Loader />
+          <div>
+            <br></br>
+            <br></br>
+            <TableContainer className={classes.tableContainer}>
+              <Table stickyHeader aria-label='sticky table'>
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => {
+                      return (
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={{
+                            minWidth: column.minWidth,
+                            fontWeight: 'bold',
+                            borderColor: 'green',
+                            borderBottomWidth: 3,
+                          }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                </TableHead>
+              </Table>
+            </TableContainer>
+            <br></br>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Loader />
+            </div>
+          </div>
         )}
       </Typography>
     </Paper>
