@@ -68,4 +68,7 @@ export const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     marginLeft: '50%',
   },
+  tableContainer: {
+    maxHeight: 500,
+  },
 }));
