@@ -137,7 +137,7 @@ function Search() {
     },
     { id: 'mineral', label: 'Mineral', minWidth: 120, align: 'left' },
     { id: 'volcano', label: 'Volcano', minWidth: 120, align: 'left' },
-    { id: 'eruption', label: 'Eruption', minWidth: 120, align: 'left' },
+    { id: 'eruption', label: 'Eruption Year', minWidth: 120, align: 'left' },
   ];
 
   return (
