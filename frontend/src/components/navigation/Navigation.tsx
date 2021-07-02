@@ -46,9 +46,16 @@ export default function Navigation(props: { authenticated: boolean }) {
         <Button
           className={classes.navBtn}
           color='inherit'
-          onClick={() => handleOnClick('/search')}
+          onClick={() => handleOnClick('/boolean-search')}
         >
-          Search Database
+          Boolean Search
+        </Button>
+        <Button
+          className={classes.navBtn}
+          color='inherit'
+          onClick={() => handleOnClick('/quick-search')}
+        >
+          Quick Search
         </Button>
 
         <Button
