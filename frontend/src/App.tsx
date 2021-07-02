@@ -10,6 +10,7 @@ import Home from './app/home/Home';
 import Input from './app/input/Input';
 import Search from './app/search/Search.js';
 import { InputAdornment } from '@material-ui/core';
+import BooleanSearch from './app/search/BooleanSearch';
 
 function App() {
   const classes = AppStyles();
@@ -35,8 +36,11 @@ function App() {
             <Route path={'/input'}>
               <Input />
             </Route>
-            <Route path={'/search'}>
+            <Route path={'/quick-search'}>
               <Search />
+            </Route>
+            <Route path={'/boolean-search'}>
+              <BooleanSearch />
             </Route>
             <Route path={'/'}>
               <Home />
