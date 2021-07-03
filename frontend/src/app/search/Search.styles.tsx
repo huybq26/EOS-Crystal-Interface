@@ -71,4 +71,25 @@ export const useStyles = makeStyles((theme) => ({
   tableContainer: {
     maxHeight: 500,
   },
+  booleanContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  optionContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginLeft: 80,
+    marginTop: 25,
+  },
+  optionText: {
+    fontWeight: 'bold',
+  },
+  typeOptions: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  options: {
+    marginLeft: 20,
+    marginTop: -5,
+  },
 }));
