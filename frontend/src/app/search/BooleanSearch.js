@@ -81,6 +81,10 @@ function BooleanSearch() {
     });
   };
 
+  const handleClear = () => {
+    setOptionState(false);
+  };
+
   const handleChange = (event) => {
     const value = event.target.value;
     setTextInput(value);
@@ -453,7 +457,7 @@ function BooleanSearch() {
         <Button
           variant='outlined'
           color='primary'
-          onClick={handleSubmit}
+          onClick={handleClear}
           className={classes.button}
         >
           Clear all fields
