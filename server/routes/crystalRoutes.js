@@ -4,6 +4,98 @@ var crystalRoutes = express.Router();
 
 var Crystal = require('../models/crystal');
 
+crystalRoutes.route('/search').get(async (req, res) => {
+  let mineralQuery = [];
+  let volcanoQuery = [];
+  let eruptionQuery = [];
+  let typeQuery = [];
+  if (req.query.mineral != undefined) {
+    // req.query.mineral.includes(',')
+    //   ? await (mineralQuery = req.query.mineral.toString().split(','))
+    //   : await (mineralQuery[0] = req.query.mineral.toString());
+    // console.log(req.query.mineral);
+    mineralQuery = req.query.mineral.toString().split(',');
+  } else if (req.query.mineral == undefined) {
+    mineralQuery = ['olivine', 'anorthoclase'];
+    // console.log('mineral is empty!');
+  }
+
+  if (req.query.volcano != undefined) {
+    // req.query.volcano.includes(',')
+    //   ? await (volcanoQuery = req.query.volcano.split(','))
+    //   : await (volcanoQuery[0] = req.query.volcano);
+
+    volcanoQuery = req.query.volcano.split(',');
+  } else if (req.query.volcano == undefined) {
+    volcanoQuery = ['Erebus', 'East pacific Rise', 'Dotsero'];
+    // console.log('volcano is empty!');
+  }
+
+  if (req.query.eruption != undefined) {
+    // req.query.eruption.includes(',')
+    //   ? await (eruptionQuery = req.query.eruption.split(','))
+    //   : await (eruptionQuery[0] = req.query.eruption);
+
+    eruptionQuery = req.query.eruption.split(',');
+  } else if (req.query.eruption == undefined) {
+    eruptionQuery = ['1997', '2005-2006', '4150'];
+    // console.log('eruption is empty!');
+  }
+
+  if (req.query.type != undefined) {
+    // req.query.type.includes(',')
+    //   ? await (typeQuery = req.query.type.split(','))
+    //   : await (typeQuery[0] = req.query.type);
+
+    typeQuery = req.query.type.split(',');
+  } else if (req.query.type == undefined) {
+    typeQuery = ['Rim-to-Rim', 'Rim-to-Core', 'Rim Only', 'None'];
+    // console.log('type is empty!');
+  }
+  // will change the else if case later to the list retrieved from below routes.
+
+  try {
+    const crystal = await Crystal.find({
+      $and: [
+        {
+          $or: [
+            { mineral: { $regex: mineralQuery[0], $options: 'i' } },
+            { mineral: { $regex: mineralQuery[1], $options: 'i' } },
+          ],
+        },
+        {
+          $or: [
+            { volcano: { $regex: volcanoQuery[0], $options: 'i' } },
+            { volcano: { $regex: volcanoQuery[1], $options: 'i' } },
+            { volcano: { $regex: volcanoQuery[2], $options: 'i' } },
+          ],
+        },
+        {
+          $or: [
+            { eruption: { $regex: eruptionQuery[0], $options: 'i' } },
+            { eruption: { $regex: eruptionQuery[1], $options: 'i' } },
+            { eruption: { $regex: eruptionQuery[2], $options: 'i' } },
+          ],
+        },
+        {
+          $or: [
+            { 'type traverse': { $regex: typeQuery[0], $options: 'i' } },
+            { 'type traverse': { $regex: typeQuery[1], $options: 'i' } },
+            { 'type traverse': { $regex: typeQuery[2], $options: 'i' } },
+          ],
+        },
+      ],
+    });
+    if (!crystal) {
+      return res.status(400).send();
+    }
+    // crystal2 = JSON.stringify(crystal);
+    res.send(crystal);
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
+
 crystalRoutes.route('/mineral').get(async (req, res) => {
   try {
     const result = await Crystal.find({});
