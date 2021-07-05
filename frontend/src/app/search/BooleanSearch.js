@@ -26,6 +26,7 @@ import DirectionsIcon from '@material-ui/icons/Directions';
 import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { STATES } from 'mongoose';
 
 function BooleanSearch() {
   const classes = useStyles();
@@ -40,50 +41,121 @@ function BooleanSearch() {
   const [typeTraverse, setTypeTraverse] = useState([]);
   const [mineral, setMineral] = useState([]);
   const [volcano, setVolcano] = useState([]);
-  const [checkedRTR, setCheckedRTR] = useState(false);
+  // const [openState, setOpenState] = useState(true);
+  const [optionState, setOptionState] = useState({
+    olivine: false,
+    anorthoclase: false,
+    erebus: false,
+    east: false,
+    dotsero: false,
+    checkedRTR: false,
+    y1997: false,
+    y20056: false,
+    y4150: false,
+    RTR: false,
+    RTC: false,
+    ROL: false,
+    None: false,
+  });
+
+  const {
+    olivine,
+    anorthoclase,
+    erebus,
+    east,
+    dotsero,
+    checkedRTR,
+    y1997,
+    y20056,
+    y4150,
+    RTR,
+    RTC,
+    ROL,
+    None,
+  } = optionState;
+
+  const handleOption = (event) => {
+    setOptionState({
+      ...optionState,
+      [event.target.name]: event.target.checked,
+    });
+  };
 
   const handleChange = (event) => {
     const value = event.target.value;
     setTextInput(value);
   };
-  let jsonList = [];
 
-  const handleOption = () => {};
+  let jsonList = [];
 
   const handleSubmit = (event) => {
     const value = event.target.value;
     event.preventDefault();
-    setSubmitText(value);
-    setSearchForText(textInput);
     setButtonClicked(true);
-    console.log(textInput);
 
-    let arraySearch = [];
-    let multipleInput = '';
+    // if (textInput.includes(' and ')) {
+    //   arraySearch = textInput.split(' and ');
+    //   multipleInput = arraySearch.join('&');
+    //   console.log('array search is: ' + arraySearch);
+    // } else {
+    //   arraySearch[0] = textInput;
+    // }
 
-    if (textInput.includes(' and ')) {
-      arraySearch = textInput.split(' and ');
-      multipleInput = arraySearch.join('&');
-      console.log('array search is: ' + arraySearch);
-    } else {
-      arraySearch[0] = textInput;
-    }
+    // const mineral = {
+
+    // }
+    let mineral = {
+      olivine: optionState.olivine,
+      anorthoclase: optionState.anorthoclase,
+    };
+    const { olivine, anorthoclase } = mineral;
+    let volcano = {
+      erebus: optionState.erebus,
+      east: optionState.east,
+      dotsero: optionState.dotsero,
+    };
+    const { erebus, east, dotsero } = volcano;
+    let eruption = {
+      y1997: optionState.y1997,
+      y20056: optionState.y20056,
+      y4150: optionState.y4150,
+    };
+    const { y1997, y20056, y4150 } = eruption;
+    let type = {
+      RTR: optionState.RTR,
+      RTC: optionState.RTC,
+      ROL: optionState.ROL,
+      None: optionState.None,
+    };
+    const { RTR, RTC, ROL, None } = type;
     let url =
-      '/crystal' +
-      (arraySearch[0]
-        ? '?q=' + arraySearch[0].toString().split(' ').join('+')
+      '/crystal/search?' +
+      (olivine == true || anorthoclase == true
+        ? 'mineral=' +
+          (olivine == true ? 'olivine' : 'afsdff') +
+          (anorthoclase == true ? ',anorthoclase' : ',asdgasdf')
         : '') +
-      (arraySearch[1]
-        ? '&q2=' + arraySearch[1].toString().split(' ').join('+')
+      //
+      (erebus == true || east == true || dotsero == true
+        ? '&volcano=' +
+          (erebus == true ? 'erebus' : 'afsdff') +
+          (east == true ? ',east' : ',afsdff') +
+          (dotsero == true ? ',dotsero' : ',afsdff')
         : '') +
-      (arraySearch[2]
-        ? '&q3=' + arraySearch[2].toString().split(' ').join('+')
+      //
+      (y1997 == true || y20056 == true || y4150 == true
+        ? '&eruption=' +
+          (y1997 == true ? '1997' : 'afsdff') +
+          (y20056 == true ? ',2005-2006' : ',afsdff') +
+          (y4150 == true ? ',4150' : ',afsdff')
         : '') +
-      (arraySearch[3]
-        ? '&q4=' + arraySearch[3].toString().split(' ').join('+')
-        : '') +
-      (arraySearch[4]
-        ? '&q5=' + arraySearch[4].toString().split(' ').join('+')
+      //
+      (RTR == true || RTC == true || ROL == true || None == true
+        ? '&type=' +
+          (RTR == true ? 'Rim-to-Rim' : 'afsdff') +
+          (RTC == true ? ',Rim-to-Core' : ',afsdff') +
+          (ROL == true ? ',Rim Only' : ',afsdff') +
+          (None == true ? ',None' : ',afsdff')
         : '');
 
     const fetchData = async () => {
@@ -149,6 +221,10 @@ function BooleanSearch() {
     { id: 'eruption', label: 'Eruption Year', minWidth: 120, align: 'left' },
   ];
 
+  const handleClick = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <Paper>
       <Typography
@@ -175,15 +251,18 @@ function BooleanSearch() {
           marginBottom: 5,
         }}
       >
-        <i>
-          Please search with keywords seperated by "and", e.g. Erebus and 1997:
-        </i>
+        <i>Please check boxes for each properties you want to filter out:</i>
       </Typography>
       <div className={classes.booleanContainer}>
         <div className={classes.optionContainer}>
           <Typography className={classes.optionText}>Mineral: </Typography>
           <FormControl className={classes.options}>
-            <Select displayEmpty value={typeTraverse} onChange={handleOption}>
+            <Select
+              displayEmpty
+              value={typeTraverse}
+              onChange={handleOption}
+              // open={openState}
+            >
               <MenuItem value='' disabled>
                 Choose your options
               </MenuItem>
@@ -191,46 +270,25 @@ function BooleanSearch() {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={anorthoclase}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='anorthoclase'
                       color='primary'
+                      onClick={handleClick}
                     />
                   }
-                  label='Rim-to-Rim'
+                  label='Anorthoclase'
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={olivine}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='olivine'
                       color='primary'
                     />
                   }
-                  label='Rim-to-Core'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={checkedRTR}
-                      onChange={handleOption}
-                      name='checkedRTR'
-                      color='primary'
-                    />
-                  }
-                  label='Rim Only'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={checkedRTR}
-                      onChange={handleOption}
-                      name='checkedRTR'
-                      color='primary'
-                    />
-                  }
-                  label='None'
+                  label='Olivine'
                 />
               </div>
             </Select>
@@ -247,46 +305,35 @@ function BooleanSearch() {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={dotsero}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='dotsero'
                       color='primary'
                     />
                   }
-                  label='Rim-to-Rim'
+                  label='Dotsero'
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={east}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='east'
                       color='primary'
                     />
                   }
-                  label='Rim-to-Core'
+                  label='East Pacific Rise'
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={erebus}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='erebus'
                       color='primary'
                     />
                   }
-                  label='Rim Only'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={checkedRTR}
-                      onChange={handleOption}
-                      name='checkedRTR'
-                      color='primary'
-                    />
-                  }
-                  label='None'
+                  label='Erebus'
                 />
               </div>
             </Select>
@@ -305,46 +352,35 @@ function BooleanSearch() {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={y1997}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='y1997'
                       color='primary'
                     />
                   }
-                  label='Rim-to-Rim'
+                  label='1997'
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={y20056}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='y20056'
                       color='primary'
                     />
                   }
-                  label='Rim-to-Core'
+                  label='2005-2006'
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={checkedRTR}
+                      checked={y4150}
                       onChange={handleOption}
-                      name='checkedRTR'
+                      name='y4150'
                       color='primary'
                     />
                   }
-                  label='Rim Only'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={checkedRTR}
-                      onChange={handleOption}
-                      name='checkedRTR'
-                      color='primary'
-                    />
-                  }
-                  label='None'
+                  label='4150'
                 />
               </div>
             </Select>
@@ -359,10 +395,10 @@ function BooleanSearch() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={checkedRTR}
+                    checked={RTR}
                     onChange={handleOption}
-                    name='checkedRTR'
-                    color='primary'
+                    name='RTR'
+                    color='secondary'
                   />
                 }
                 label='Rim-to-Rim'
@@ -370,10 +406,10 @@ function BooleanSearch() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={checkedRTR}
+                    checked={RTC}
                     onChange={handleOption}
-                    name='checkedRTR'
-                    color='primary'
+                    name='RTC'
+                    color='secondary'
                   />
                 }
                 label='Rim-to-Core'
@@ -381,10 +417,10 @@ function BooleanSearch() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={checkedRTR}
+                    checked={ROL}
                     onChange={handleOption}
-                    name='checkedRTR'
-                    color='primary'
+                    name='ROL'
+                    color='secondary'
                   />
                 }
                 label='Rim Only'
@@ -392,10 +428,10 @@ function BooleanSearch() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={checkedRTR}
+                    checked={None}
                     onChange={handleOption}
-                    name='checkedRTR'
-                    color='primary'
+                    name='None'
+                    color='secondary'
                   />
                 }
                 label='None'
@@ -411,7 +447,7 @@ function BooleanSearch() {
           justifyContent: 'center',
           marginLeft: 360,
           marginTop: -10,
-          marginBottom: -10,
+          marginBottom: 10,
         }}
       >
         <Button
@@ -435,15 +471,6 @@ function BooleanSearch() {
       <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
         {searchData.length != 0 ? (
           <Typography>
-            {/* <ul>{items}</ul> */}
-            <Typography
-              component='h3'
-              variant='h5'
-              align='center'
-              style={{ paddingBottom: 10 }}
-            >
-              Search results for "{searchForText}":
-            </Typography>
             <TableContainer className={classes.tableContainer}>
               <Table stickyHeader aria-label='sticky table'>
                 <TableHead>
