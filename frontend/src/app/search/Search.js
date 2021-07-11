@@ -13,6 +13,7 @@ import {
   TableRow,
   TableCell,
   TablePagination,
+  Button,
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -20,6 +21,7 @@ import DirectionsIcon from '@material-ui/icons/Directions';
 import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { JsonToExcel } from '../../utils/JsonToExcel';
 
 function Search() {
   const classes = useStyles();
@@ -31,6 +33,7 @@ function Search() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchForText, setSearchForText] = useState('');
+  const [resultURL, setResultURL] = useState('');
   const handleChange = (event) => {
     const value = event.target.value;
     setTextInput(value);
@@ -56,7 +59,7 @@ function Search() {
       arraySearch[0] = textInput;
     }
     let url =
-      '/search' +
+      '/crystal' +
       (arraySearch[0]
         ? '?q=' + arraySearch[0].toString().split(' ').join('+')
         : '') +
@@ -76,7 +79,7 @@ function Search() {
     // if (multipleInput != '') {
     //   url = '/search?q=' + multipleInput.toString().split(' ').join('+');
     // }
-
+    setResultURL(url);
     const fetchData = async () => {
       try {
         const result = await fetch(url);
@@ -85,6 +88,7 @@ function Search() {
         jsonList = json;
         setButtonClicked(false);
         console.log(url);
+        JsonToExcel(json);
       } catch (e) {
         console.log(e);
       }
@@ -140,6 +144,23 @@ function Search() {
     { id: 'eruption', label: 'Eruption Year', minWidth: 120, align: 'left' },
   ];
 
+  const handleDownload = (exportObj, exportName) => {
+    var dataStr =
+      'data:text/json;charset=utf-8,' +
+      encodeURIComponent(JSON.stringify(exportObj));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute('href', dataStr);
+    downloadAnchorNode.setAttribute('download', exportName + '.json');
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    // downloadAnchorNode.remove();
+  };
+  // const theme = createMuiTheme({
+  //   palette: {
+  //     primary: green,
+  //   },
+  // });
+
   return (
     <Paper>
       <Typography
@@ -148,7 +169,7 @@ function Search() {
         align='center'
         style={{ paddingTop: 30, paddingBottom: 10 }}
       >
-        Search in Crystal Database
+        Crystal Database Search
       </Typography>
       <hr
         style={{
@@ -199,10 +220,34 @@ function Search() {
               component='h3'
               variant='h5'
               align='center'
-              style={{ paddingBottom: 10 }}
+              style={{ marginBottom: 10 }}
             >
               Search results for "{searchForText}":
             </Typography>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginTop: 10,
+                marginRight: 20,
+                marginBottom: 10,
+              }}
+            >
+              <Button
+                onClick={() => handleDownload(searchData, 'data')}
+                style={{
+                  borderRadius: 35,
+                  backgroundColor: '#21b6ae',
+                  padding: '10px 20px',
+                  fontSize: '15px',
+                }}
+                variant='contained'
+                color='primary'
+              >
+                Download in JSON format
+              </Button>
+            </div>
             <TableContainer className={classes.tableContainer}>
               <Table stickyHeader aria-label='sticky table'>
                 <TableHead>
