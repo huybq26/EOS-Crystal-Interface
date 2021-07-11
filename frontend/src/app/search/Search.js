@@ -21,7 +21,8 @@ import DirectionsIcon from '@material-ui/icons/Directions';
 import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import { JsonToExcel } from '../../utils/JsonToExcel';
+import { exportExcelFile } from '../../utils/JsonToExcel';
+import exportJsonFile from '../../utils/JsonExport';
 
 function Search() {
   const classes = useStyles();
@@ -88,7 +89,6 @@ function Search() {
         jsonList = json;
         setButtonClicked(false);
         console.log(url);
-        JsonToExcel(json);
       } catch (e) {
         console.log(e);
       }
@@ -143,23 +143,6 @@ function Search() {
     { id: 'volcano', label: 'Volcano', minWidth: 120, align: 'left' },
     { id: 'eruption', label: 'Eruption Year', minWidth: 120, align: 'left' },
   ];
-
-  const handleDownload = (exportObj, exportName) => {
-    var dataStr =
-      'data:text/json;charset=utf-8,' +
-      encodeURIComponent(JSON.stringify(exportObj));
-    var downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute('href', dataStr);
-    downloadAnchorNode.setAttribute('download', exportName + '.json');
-    document.body.appendChild(downloadAnchorNode); // required for firefox
-    downloadAnchorNode.click();
-    // downloadAnchorNode.remove();
-  };
-  // const theme = createMuiTheme({
-  //   palette: {
-  //     primary: green,
-  //   },
-  // });
 
   return (
     <Paper>
@@ -235,7 +218,7 @@ function Search() {
               }}
             >
               <Button
-                onClick={() => handleDownload(searchData, 'data')}
+                onClick={() => exportJsonFile(searchData, 'data_json')}
                 style={{
                   borderRadius: 35,
                   backgroundColor: '#21b6ae',
@@ -245,7 +228,20 @@ function Search() {
                 variant='contained'
                 color='primary'
               >
-                Download in JSON format
+                Export data in JSON
+              </Button>
+              <Button
+                onClick={() => exportExcelFile(searchData)}
+                style={{
+                  borderRadius: 35,
+                  backgroundColor: '#34bf24',
+                  padding: '10px 20px',
+                  fontSize: '15px',
+                }}
+                variant='contained'
+                color='primary'
+              >
+                Export data in Excel
               </Button>
             </div>
             <TableContainer className={classes.tableContainer}>
