@@ -20,13 +20,11 @@ import {
   FormControlLabel,
   Button,
 } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
-import DirectionsIcon from '@material-ui/icons/Directions';
 import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import { STATES } from 'mongoose';
+import { exportExcelFile } from '../../utils/JsonToExcel';
+import exportJsonFile from '../../utils/JsonExport';
 
 function BooleanSearch() {
   const classes = useStyles();
@@ -255,7 +253,7 @@ function BooleanSearch() {
           marginBottom: 5,
         }}
       >
-        <i>Please check boxes for each properties you want to filter out:</i>
+        <i>Please check boxes for each property you want to filter out:</i>
       </Typography>
       <div className={classes.booleanContainer}>
         <div className={classes.optionContainer}>
@@ -290,6 +288,7 @@ function BooleanSearch() {
                       onChange={handleOption}
                       name='olivine'
                       color='primary'
+                      onClick={handleClick}
                     />
                   }
                   label='Olivine'
@@ -450,8 +449,8 @@ function BooleanSearch() {
           flexDirection: 'row',
           justifyContent: 'center',
           marginLeft: 360,
-          marginTop: -10,
-          marginBottom: 10,
+          marginTop: -15,
+          marginBottom: 30,
         }}
       >
         <Button
@@ -475,6 +474,51 @@ function BooleanSearch() {
       <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
         {searchData.length != 0 ? (
           <Typography>
+            <Typography
+              component='h3'
+              variant='h5'
+              align='center'
+              style={{ marginBottom: 10 }}
+            >
+              Search results:
+            </Typography>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginTop: 10,
+                marginRight: 20,
+                marginBottom: 10,
+              }}
+            >
+              <Button
+                onClick={() => exportJsonFile(searchData, 'data_json')}
+                style={{
+                  borderRadius: 35,
+                  backgroundColor: '#21b6ae',
+                  padding: '10px 20px',
+                  fontSize: '15px',
+                }}
+                variant='contained'
+                color='primary'
+              >
+                Export data in JSON
+              </Button>
+              <Button
+                onClick={() => exportExcelFile(searchData)}
+                style={{
+                  borderRadius: 35,
+                  backgroundColor: '#34bf24',
+                  padding: '10px 20px',
+                  fontSize: '15px',
+                }}
+                variant='contained'
+                color='primary'
+              >
+                Export data in Excel
+              </Button>
+            </div>
             <TableContainer className={classes.tableContainer}>
               <Table stickyHeader aria-label='sticky table'>
                 <TableHead>
