@@ -5,63 +5,39 @@ const fetch = require('node-fetch');
 
 var Crystal = require('../models/crystal');
 
-// console.log(mineralArray);
 crystalRoutes.route('/search').get(async (req, res) => {
   // route for boolean search
   let mineralQuery = [];
   let volcanoQuery = [];
   let eruptionQuery = [];
-  let mineralArray = ['olivine', 'anorthoclase', 'Olivine']; // will modify later
+  let mineralArray = ['olivine', 'anorthoclase']; // will modify later
   let volcanoArray = ['Erebus', 'East Pacific Rise', 'Dotsero']; // will modify later
   let eruptionArray = ['1997', '2005-2006', '4150']; // will modify later
-  let typeQuery = [];
+  let typeArray = ['Rim-to-Rim', 'Rim-to-Core', 'Rim Only', 'None'];
+
   if (req.query.mineral != undefined) {
-    // req.query.mineral.includes(',')
-    //   ? await (mineralQuery = req.query.mineral.toString().split(','))
-    //   : await (mineralQuery[0] = req.query.mineral.toString());
-    // console.log(req.query.mineral);
     mineralQuery = req.query.mineral.toString().split(',');
   } else if (req.query.mineral == undefined) {
-    // mineralQuery = ['olivine', 'anorthoclase'];
     mineralQuery = mineralArray;
-    // console.log('mineral is empty!');
   }
 
   if (req.query.volcano != undefined) {
-    // req.query.volcano.includes(',')
-    //   ? await (volcanoQuery = req.query.volcano.split(','))
-    //   : await (volcanoQuery[0] = req.query.volcano);
-
     volcanoQuery = req.query.volcano.toString().split(',');
   } else if (req.query.volcano == undefined) {
-    // volcanoQuery = ['Erebus', 'East pacific Rise', 'Dotsero'];
     volcanoQuery = volcanoArray;
-    // console.log('volcano is empty!');
   }
 
   if (req.query.eruption != undefined) {
-    // req.query.eruption.includes(',')
-    //   ? await (eruptionQuery = req.query.eruption.split(','))
-    //   : await (eruptionQuery[0] = req.query.eruption);
-
     eruptionQuery = req.query.eruption.split(',');
   } else if (req.query.eruption == undefined) {
-    // eruptionQuery = ['1997', '2005-2006', '4150'];
     eruptionQuery = eruptionArray;
-    // console.log('eruption is empty!');
   }
 
   if (req.query.type != undefined) {
-    // req.query.type.includes(',')
-    //   ? await (typeQuery = req.query.type.split(','))
-    //   : await (typeQuery[0] = req.query.type);
-
     typeQuery = req.query.type.split(',');
   } else if (req.query.type == undefined) {
-    typeQuery = ['Rim-to-Rim', 'Rim-to-Core', 'Rim Only', 'None'];
-    // console.log('type is empty!');
+    typeQuery = typeArray;
   }
-  // will change the else if case later to the list retrieved from below routes.
 
   try {
     const crystal = await Crystal.find({
@@ -79,13 +55,10 @@ crystalRoutes.route('/search').get(async (req, res) => {
             $in: volcanoQuery,
           },
         },
-
         {
-          $or: [
-            { 'type traverse': { $regex: typeQuery[0], $options: 'i' } },
-            { 'type traverse': { $regex: typeQuery[1], $options: 'i' } },
-            { 'type traverse': { $regex: typeQuery[2], $options: 'i' } },
-          ],
+          'type traverse': {
+            $in: typeQuery,
+          },
         },
       ],
     }).collation({
