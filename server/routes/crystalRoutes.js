@@ -1,13 +1,19 @@
 var express = require('express');
 var app = express();
 var crystalRoutes = express.Router();
+const fetch = require('node-fetch');
 
 var Crystal = require('../models/crystal');
 
+// console.log(mineralArray);
 crystalRoutes.route('/search').get(async (req, res) => {
+  // route for boolean search
   let mineralQuery = [];
   let volcanoQuery = [];
   let eruptionQuery = [];
+  let mineralArray = ['olivine', 'anorthoclase', 'Olivine']; // will modify later
+  let volcanoArray = ['Erebus', 'East Pacific Rise', 'Dotsero']; // will modify later
+  let eruptionArray = ['1997', '2005-2006', '4150']; // will modify later
   let typeQuery = [];
   if (req.query.mineral != undefined) {
     // req.query.mineral.includes(',')
@@ -16,7 +22,8 @@ crystalRoutes.route('/search').get(async (req, res) => {
     // console.log(req.query.mineral);
     mineralQuery = req.query.mineral.toString().split(',');
   } else if (req.query.mineral == undefined) {
-    mineralQuery = ['olivine', 'anorthoclase'];
+    // mineralQuery = ['olivine', 'anorthoclase'];
+    mineralQuery = mineralArray;
     // console.log('mineral is empty!');
   }
 
@@ -25,9 +32,10 @@ crystalRoutes.route('/search').get(async (req, res) => {
     //   ? await (volcanoQuery = req.query.volcano.split(','))
     //   : await (volcanoQuery[0] = req.query.volcano);
 
-    volcanoQuery = req.query.volcano.split(',');
+    volcanoQuery = req.query.volcano.toString().split(',');
   } else if (req.query.volcano == undefined) {
-    volcanoQuery = ['Erebus', 'East pacific Rise', 'Dotsero'];
+    // volcanoQuery = ['Erebus', 'East pacific Rise', 'Dotsero'];
+    volcanoQuery = volcanoArray;
     // console.log('volcano is empty!');
   }
 
@@ -38,7 +46,8 @@ crystalRoutes.route('/search').get(async (req, res) => {
 
     eruptionQuery = req.query.eruption.split(',');
   } else if (req.query.eruption == undefined) {
-    eruptionQuery = ['1997', '2005-2006', '4150'];
+    // eruptionQuery = ['1997', '2005-2006', '4150'];
+    eruptionQuery = eruptionArray;
     // console.log('eruption is empty!');
   }
 
@@ -58,25 +67,19 @@ crystalRoutes.route('/search').get(async (req, res) => {
     const crystal = await Crystal.find({
       $and: [
         {
-          $or: [
-            { mineral: { $regex: mineralQuery[0], $options: 'i' } },
-            { mineral: { $regex: mineralQuery[1], $options: 'i' } },
-          ],
+          mineral: {
+            $in: mineralQuery,
+          },
         },
         {
-          $or: [
-            { volcano: { $regex: volcanoQuery[0], $options: 'i' } },
-            { volcano: { $regex: volcanoQuery[1], $options: 'i' } },
-            { volcano: { $regex: volcanoQuery[2], $options: 'i' } },
-          ],
+          eruption: { $in: eruptionQuery },
         },
         {
-          $or: [
-            { eruption: { $regex: eruptionQuery[0], $options: 'i' } },
-            { eruption: { $regex: eruptionQuery[1], $options: 'i' } },
-            { eruption: { $regex: eruptionQuery[2], $options: 'i' } },
-          ],
+          volcano: {
+            $in: volcanoQuery,
+          },
         },
+
         {
           $or: [
             { 'type traverse': { $regex: typeQuery[0], $options: 'i' } },
@@ -85,11 +88,13 @@ crystalRoutes.route('/search').get(async (req, res) => {
           ],
         },
       ],
+    }).collation({
+      locale: 'en',
+      strength: 1,
     });
     if (!crystal) {
       return res.status(400).send();
     }
-    // crystal2 = JSON.stringify(crystal);
     res.send(crystal);
   } catch (e) {
     res.status(500).send(e);
@@ -165,6 +170,7 @@ crystalRoutes.route('/:id').get(async (req, res) => {
 });
 
 crystalRoutes.route('/').get(async (req, res) => {
+  // route for quick search (search by string input)
   // app.get('/search', async (req, res) => {
   // const keyword = req.query.q;
   let keyword = '';
