@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, createRef } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {
-  IconButton,
   Paper,
   TextField,
-  Divider,
   Typography,
   TableContainer,
   Table,
@@ -13,81 +12,78 @@ import {
   TableRow,
   TableCell,
   TablePagination,
-  Select,
-  MenuItem,
-  FormControl,
   Checkbox,
-  FormControlLabel,
   Button,
 } from '@material-ui/core';
 import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { exportExcelFile } from '../../utils/JsonToExcel';
 import exportJsonFile from '../../utils/JsonExport';
+
+let mineralArray = ['Olivine', 'Anorthoclase'];
+let volcanoArray = ['Erebus', 'East Pacific Rise', 'Dotsero'];
+let eruptionArray = ['1997', '2005-2006', '4150'];
+let typeArray = ['Rim-to-Rim', 'Rim-to-Core', 'Rim Only', 'None'];
 
 function BooleanSearch() {
   const classes = useStyles();
   const history = useHistory();
   const [textInput, setTextInput] = useState('');
-  const [submitText, setSubmitText] = useState('');
   const [searchData, setSearchData] = useState([]);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchForText, setSearchForText] = useState('');
-  const [typeTraverse, setTypeTraverse] = useState([]);
   const [mineral, setMineral] = useState([]);
   const [volcano, setVolcano] = useState([]);
-  // const [openState, setOpenState] = useState(true);
-  const [optionState, setOptionState] = useState({
-    olivine: false,
-    anorthoclase: false,
-    erebus: false,
-    east: false,
-    dotsero: false,
-    checkedRTR: false,
-    y1997: false,
-    y20056: false,
-    y4150: false,
-    RTR: false,
-    RTC: false,
-    ROL: false,
-    None: false,
-  });
+  const [eruption, setEruption] = useState([]);
+  const [type, setType] = useState([]);
 
-  const {
-    olivine,
-    anorthoclase,
-    erebus,
-    east,
-    dotsero,
-    checkedRTR,
-    y1997,
-    y20056,
-    y4150,
-    RTR,
-    RTC,
-    ROL,
-    None,
-  } = optionState;
+  // const handleOption = (event) => {
+  //   setOptionState({
+  //     ...optionState,
+  //     [event.target.name]: event.target.checked,
+  //   });
+  // };
 
-  const handleOption = (event) => {
-    setOptionState({
-      ...optionState,
-      [event.target.name]: event.target.checked,
-    });
+  // useEffect(() => {
+  //   mineralArray = fetch("/crystal/mineral")
+  //   volcanoArray = fetch("/crystal/volcano")
+  //   eruptionArray = fetch("/crystal/eruption")
+  // },[mineral])
+
+  const onMineralChange = (event, values) => {
+    setMineral(values);
   };
+  console.log(mineral);
+
+  const onVolcanoChange = (event, values) => {
+    setVolcano(values);
+  };
+  console.log(volcano);
+
+  const onEruptionChange = (event, values) => {
+    setEruption(values);
+  };
+  console.log(eruption);
+
+  const onTypeChange = (event, values) => {
+    setType(values);
+  };
+  console.log(type);
+  console.log(mineral.length);
 
   const handleClear = () => {
-    setOptionState(false);
+    // setMineral([]);
+    // setVolcano([]);
+    // setEruption([]);
+    // setType([]);
   };
 
   const handleChange = (event) => {
     const value = event.target.value;
     setTextInput(value);
   };
-
+  console.log(eruption.forEach((element) => console.log(`,${element},`)));
   let jsonList = [];
 
   const handleSubmit = (event) => {
@@ -95,70 +91,20 @@ function BooleanSearch() {
     event.preventDefault();
     setButtonClicked(true);
 
-    // if (textInput.includes(' and ')) {
-    //   arraySearch = textInput.split(' and ');
-    //   multipleInput = arraySearch.join('&');
-    //   console.log('array search is: ' + arraySearch);
-    // } else {
-    //   arraySearch[0] = textInput;
-    // }
-
-    // const mineral = {
-
-    // }
-    let mineral = {
-      olivine: optionState.olivine,
-      anorthoclase: optionState.anorthoclase,
-    };
-    const { olivine, anorthoclase } = mineral;
-    let volcano = {
-      erebus: optionState.erebus,
-      east: optionState.east,
-      dotsero: optionState.dotsero,
-    };
-    const { erebus, east, dotsero } = volcano;
-    let eruption = {
-      y1997: optionState.y1997,
-      y20056: optionState.y20056,
-      y4150: optionState.y4150,
-    };
-    const { y1997, y20056, y4150 } = eruption;
-    let type = {
-      RTR: optionState.RTR,
-      RTC: optionState.RTC,
-      ROL: optionState.ROL,
-      None: optionState.None,
-    };
-    const { RTR, RTC, ROL, None } = type;
+    let mineralString = '&mineral=';
+    let volcanoString = '&volcano=';
+    let eruptionString = '&eruption=';
+    let typeString = '&type=';
+    mineral.forEach((element) => (mineralString += `${element},`));
+    volcano.forEach((element) => (volcanoString += `${element},`));
+    eruption.forEach((element) => (eruptionString += `${element},`));
+    type.forEach((element) => (typeString += `${element},`));
     let url =
       '/crystal/search?' +
-      (olivine == true || anorthoclase == true
-        ? 'mineral=' +
-          (olivine == true ? 'olivine' : 'afsdff') +
-          (anorthoclase == true ? ',anorthoclase' : ',asdgasdf')
-        : '') +
-      //
-      (erebus == true || east == true || dotsero == true
-        ? '&volcano=' +
-          (erebus == true ? 'erebus' : 'afsdff') +
-          (east == true ? ',east' : ',afsdff') +
-          (dotsero == true ? ',dotsero' : ',afsdff')
-        : '') +
-      //
-      (y1997 == true || y20056 == true || y4150 == true
-        ? '&eruption=' +
-          (y1997 == true ? '1997' : 'afsdff') +
-          (y20056 == true ? ',2005-2006' : ',afsdff') +
-          (y4150 == true ? ',4150' : ',afsdff')
-        : '') +
-      //
-      (RTR == true || RTC == true || ROL == true || None == true
-        ? '&type=' +
-          (RTR == true ? 'Rim-to-Rim' : 'afsdff') +
-          (RTC == true ? ',Rim-to-Core' : ',afsdff') +
-          (ROL == true ? ',Rim Only' : ',afsdff') +
-          (None == true ? ',None' : ',afsdff')
-        : '');
+      (mineral.length > 0 ? mineralString : '') +
+      (volcano.length > 0 ? volcanoString : '') +
+      (eruption.length > 0 ? eruptionString : '') +
+      (type.length > 0 ? typeString : '');
 
     const fetchData = async () => {
       try {
@@ -253,194 +199,92 @@ function BooleanSearch() {
           marginBottom: 5,
         }}
       >
-        <i>Please check boxes for each property you want to filter out:</i>
+        <i>
+          Please choose or type in attributes for each property you want to
+          filter out:
+        </i>
       </Typography>
       <div className={classes.booleanContainer}>
         <div className={classes.optionContainer}>
-          <Typography className={classes.optionText}>Mineral: </Typography>
-          <FormControl className={classes.options}>
-            <Select
-              displayEmpty
-              value={typeTraverse}
-              onChange={handleOption}
-              // open={openState}
-            >
-              <MenuItem value='' disabled>
-                Choose your options
-              </MenuItem>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={anorthoclase}
-                      onChange={handleOption}
-                      name='anorthoclase'
-                      color='primary'
-                      onClick={handleClick}
-                    />
-                  }
-                  label='Anorthoclase'
+          <div style={{ width: 500, marginLeft: 30 }}>
+            <Autocomplete
+              multiple
+              limitTags={3}
+              // disableCloseOnSelect
+              options={mineralArray}
+              onChange={onMineralChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant='standard'
+                  label='Mineral filter'
+                  margin='normal'
+                  fullWidth
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={olivine}
-                      onChange={handleOption}
-                      name='olivine'
-                      color='primary'
-                      onClick={handleClick}
-                    />
-                  }
-                  label='Olivine'
-                />
-              </div>
-            </Select>
-          </FormControl>
+              )}
+            />
+          </div>
         </div>
         <div className={classes.optionContainer}>
-          <Typography className={classes.optionText}>Volcano: </Typography>
-          <FormControl className={classes.options}>
-            <Select displayEmpty value={typeTraverse} onChange={handleOption}>
-              <MenuItem value='' disabled>
-                Choose your options
-              </MenuItem>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={dotsero}
-                      onChange={handleOption}
-                      name='dotsero'
-                      color='primary'
-                    />
-                  }
-                  label='Dotsero'
+          <div style={{ width: 500, marginLeft: 30 }}>
+            <Autocomplete
+              multiple
+              limitTags={3}
+              // disableCloseOnSelect
+              options={volcanoArray}
+              // disableCloseOnSelect
+              onChange={onVolcanoChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant='standard'
+                  label='Volcano filter'
+                  margin='normal'
+                  fullWidth
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={east}
-                      onChange={handleOption}
-                      name='east'
-                      color='primary'
-                    />
-                  }
-                  label='East Pacific Rise'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={erebus}
-                      onChange={handleOption}
-                      name='erebus'
-                      color='primary'
-                    />
-                  }
-                  label='Erebus'
-                />
-              </div>
-            </Select>
-          </FormControl>
+              )}
+            />
+          </div>
         </div>
         <div className={classes.optionContainer}>
-          <Typography className={classes.optionText}>
-            Eruption Year:{' '}
-          </Typography>
-          <FormControl className={classes.options}>
-            <Select displayEmpty value={typeTraverse} onChange={handleOption}>
-              <MenuItem value='' disabled>
-                Choose your options
-              </MenuItem>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={y1997}
-                      onChange={handleOption}
-                      name='y1997'
-                      color='primary'
-                    />
-                  }
-                  label='1997'
+          <div style={{ width: 500, marginLeft: 30 }}>
+            <Autocomplete
+              multiple
+              limitTags={3}
+              // disableCloseOnSelect
+              options={eruptionArray}
+              onChange={onEruptionChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant='standard'
+                  label='Eruption Year filter'
+                  margin='normal'
+                  fullWidth
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={y20056}
-                      onChange={handleOption}
-                      name='y20056'
-                      color='primary'
-                    />
-                  }
-                  label='2005-2006'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={y4150}
-                      onChange={handleOption}
-                      name='y4150'
-                      color='primary'
-                    />
-                  }
-                  label='4150'
-                />
-              </div>
-            </Select>
-          </FormControl>
+              )}
+            />
+          </div>
         </div>
         <div className={classes.optionContainer}>
-          <Typography className={classes.optionText}>
-            Type Traverse:{' '}
-          </Typography>
-          <FormControl className={classes.options}>
-            <div className={classes.typeOptions}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={RTR}
-                    onChange={handleOption}
-                    name='RTR'
-                    color='secondary'
-                  />
-                }
-                label='Rim-to-Rim'
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={RTC}
-                    onChange={handleOption}
-                    name='RTC'
-                    color='secondary'
-                  />
-                }
-                label='Rim-to-Core'
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={ROL}
-                    onChange={handleOption}
-                    name='ROL'
-                    color='secondary'
-                  />
-                }
-                label='Rim Only'
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={None}
-                    onChange={handleOption}
-                    name='None'
-                    color='secondary'
-                  />
-                }
-                label='None'
-              />
-            </div>
-          </FormControl>
+          <div style={{ width: 500, marginLeft: 30 }}>
+            <Autocomplete
+              multiple
+              limitTags={3}
+              // disableCloseOnSelect
+              options={typeArray}
+              onChange={onTypeChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant='standard'
+                  label='Type traverse filter'
+                  margin='normal'
+                  fullWidth
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
       <div
@@ -621,4 +465,5 @@ function BooleanSearch() {
     </Paper>
   );
 }
+
 export default BooleanSearch;
