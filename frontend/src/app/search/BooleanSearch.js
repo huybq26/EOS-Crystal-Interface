@@ -19,6 +19,11 @@ import { useStyles } from './Search.styles';
 import { useHistory } from 'react-router-dom';
 import { exportExcelFile } from '../../utils/JsonToExcel';
 import exportJsonFile from '../../utils/JsonExport';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+
+const icon = <CheckBoxOutlineBlankIcon fontSize='small' />;
+const checkedIcon = <CheckBoxIcon fontSize='small' />;
 
 let mineralArray = ['Olivine', 'Anorthoclase'];
 let volcanoArray = ['Erebus', 'East Pacific Rise', 'Dotsero'];
@@ -213,6 +218,7 @@ function BooleanSearch() {
               // disableCloseOnSelect
               options={mineralArray}
               onChange={onMineralChange}
+              style={{ width: 500 }}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -221,6 +227,17 @@ function BooleanSearch() {
                   margin='normal'
                   fullWidth
                 />
+              )}
+              renderOption={(option, { selected }) => (
+                <React.Fragment>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option}
+                </React.Fragment>
               )}
             />
           </div>
@@ -232,7 +249,6 @@ function BooleanSearch() {
               limitTags={3}
               // disableCloseOnSelect
               options={volcanoArray}
-              // disableCloseOnSelect
               onChange={onVolcanoChange}
               renderInput={(params) => (
                 <TextField
@@ -242,6 +258,17 @@ function BooleanSearch() {
                   margin='normal'
                   fullWidth
                 />
+              )}
+              renderOption={(option, { selected }) => (
+                <React.Fragment>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option}
+                </React.Fragment>
               )}
             />
           </div>
@@ -263,6 +290,17 @@ function BooleanSearch() {
                   fullWidth
                 />
               )}
+              renderOption={(option, { selected }) => (
+                <React.Fragment>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option}
+                </React.Fragment>
+              )}
             />
           </div>
         </div>
@@ -282,6 +320,17 @@ function BooleanSearch() {
                   margin='normal'
                   fullWidth
                 />
+              )}
+              renderOption={(option, { selected }) => (
+                <React.Fragment>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option}
+                </React.Fragment>
               )}
             />
           </div>
