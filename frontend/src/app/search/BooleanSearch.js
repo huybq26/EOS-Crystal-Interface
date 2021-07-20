@@ -223,7 +223,7 @@ function BooleanSearch() {
                 <TextField
                   {...params}
                   variant='standard'
-                  label='Mineral filter'
+                  label='Mineral'
                   margin='normal'
                   fullWidth
                 />
@@ -254,7 +254,7 @@ function BooleanSearch() {
                 <TextField
                   {...params}
                   variant='standard'
-                  label='Volcano filter'
+                  label='Volcano'
                   margin='normal'
                   fullWidth
                 />
@@ -285,7 +285,7 @@ function BooleanSearch() {
                 <TextField
                   {...params}
                   variant='standard'
-                  label='Eruption Year filter'
+                  label='Eruption Year'
                   margin='normal'
                   fullWidth
                 />
@@ -316,7 +316,7 @@ function BooleanSearch() {
                 <TextField
                   {...params}
                   variant='standard'
-                  label='Type traverse filter'
+                  label='Type traverse'
                   margin='normal'
                   fullWidth
                 />
