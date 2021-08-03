@@ -1,256 +1,192 @@
-import React, { ChangeEvent } from 'react';
+import React from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import {
-  Button,
-  Paper,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography,
+	Box,
+	Button,
+	Paper,
+	Typography,
+	LinearProgress,
 } from '@material-ui/core';
 import { InputStyles } from './Input.styles';
-import UploadFile from './UploadFile';
-import ConfirmData from './ConfirmData';
 import { excelToJson } from '../../utils/ExcelToJson';
-import Fade from '@material-ui/core/Fade';
 
-const steps = ['Upload File', 'Confirm Data'];
 
 export default function Input() {
-  const classes = InputStyles();
+	const classes = InputStyles();
 
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [excelFile, setExcelFile] = React.useState<File | null>(null);
-  const [excelFile1, setExcelFile1] = React.useState<File | null>(null);
-  const [excelFileList, setExcelFileList] =
-    React.useState<FileList | null>(null);
-  const [jsonData, setJsonData] = React.useState<any>({
-    'crystal name': '',
-    'type traverse': '',
-    axis: '',
-    orientation: '',
-    mineral: '',
-    volcano: '',
-    eruption: '',
-    reference: '',
-    //author: '',
-    //doi: '',
-    traverse: [],
-  });
+	const [{ processed, outstanding }, dispatchQueue] = React.useReducer(queueReducer, { processed: [], outstanding: [] })
 
-  const [jsonData2, setJsonData2] = React.useState<any>({
-    'crystal name': '',
-    'type traverse': '',
-    axis: '',
-    orientation: '',
-    mineral: '',
-    volcano: '',
-    eruption: '',
-    reference: '',
-    //author: '',
-    //doi: '',
-    traverse: [],
-  });
-  let sampleObject = {
-    'crystal name': '',
-    'type traverse': '',
-    axis: '',
-    orientation: '',
-    mineral: '',
-    volcano: '',
-    eruption: '',
-    reference: '',
-    //author: '',
-    //doi: '',
-    traverse: [],
-  };
-  const [jsonDataList, setJsonDataList] = React.useState<any>([
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-    sampleObject,
-  ]);
+	const uploaded = processed.length + outstanding.length
+	const remaining = outstanding.length
 
-  const onExcelFileChange = (newFile: File | null): void => {
-    setExcelFile(newFile);
-    if (newFile) {
-      excelToJson(newFile).then((data) => {
-        setJsonData({ ...data });
-      });
-    }
-  };
+	const removeCurrent = useCallback(() => dispatchQueue({ type: "pop" }), [dispatchQueue])
+	const uploadFiles = useCallback((files: FileList) =>
+		dispatchQueue({ type: "upload", files: Array.from(files).map(file => ({ file, fileName: file.name })) }), [dispatchQueue])
+	const clearQueue = useCallback(() => dispatchQueue({ type: "clear" }), [dispatchQueue])
 
-  const onExcelFileChange1 = (newFile: File | null): void => {
-    setExcelFile1(newFile);
-    if (newFile) {
-      excelToJson(newFile).then((data) => {
-        setJsonData2({ ...data });
-      });
-    }
-  };
-  // const onExcelFileChange = (newFile: File | null): void => {
-  //   setExcelFile(newFile);
-  //   if (newFile) {
-  //     excelToJson(newFile).then((data) => {
-  //       setJsonData({ ...data });
-  //     });
-  //   }
-  // };
+	useEffect(() => {
+		const entry = outstanding[0]
+		if (entry) {
+			processEntry(entry)
+			dispatchQueue({ type: "processing" })
+		}
+	}, [outstanding.length])
 
-  const onExcelFileChangeList = async (newFiles: FileList | null) => {
-    setExcelFileList(newFiles);
-    // setJsonDataList([{}]);
-    // console.log('data');
-    if (newFiles) {
-      // console.log('data');
-      // Array.from(newFiles).forEach((file) => {
-      console.log('There are', newFiles.length, 'files');
-      for (let i = 0; i < newFiles.length; i++) {
-        let file = newFiles[i];
+	const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const files = e.target.files;
+		if (files) {
+			uploadFiles(files)
+		}
+	}
 
-        console.log('Processing file ', file.name);
-        await excelToJson(file).then((data) => {
-          // console.log('data');
-          // setJsonDataList((oldArray: any) => [...oldArray, data]);
-          // console.log('Previous json array is: ', jsonDataList);
-          // setJsonDataList([...jsonDataList, data]);
-          jsonDataList.unshift(data);
-          // console.log('Subsequent json array is: ', jsonDataList);
-          // console.log('Sample Array is:', sampleArray);
-          // console.log(jsonDataList);
-        });
-      }
-    }
-    // await setJsonDataList([...sampleArray]);
-    // console.log(jsonDataList[1]['crystal name']);
-    console.log('The desired item is: ', jsonDataList);
-  };
+	const nextData = async () => {
+		const outstandingFirst = outstanding[0]
+		const processedResult = await outstandingFirst.result;
+		if (processedResult)
+			dispatchQueue({ type: "processed", ...processedResult })
+	}
 
-  // console.log('Final json array is: ', jsonDataList);
+	const saveData = async () => {
+		console.log(processed)
+	}
 
-  const handleNext = (): void => {
-    setActiveStep(activeStep + 1);
-  };
+	return (
+		<Paper className={classes.paper}>
+			<Typography component='h1' variant='h5' align='center'>
+				New Crystal Data
+			</Typography>
 
-  const handleBack = (): void => {
-    setActiveStep(activeStep - 1);
-  };
+			<React.Fragment>
 
-  const disableNext = (): boolean => {
-    if (activeStep == 0 && excelFileList == null) {
-      return true;
-    }
+				<div style={{ position: 'relative' }}>
+					<div style={uploaded <= 0 ? { display: 'block' } : { display: 'none' }}>
+						<Box className={classes.spacing} display='flex'>
+							<Button variant='contained' component='label'>
+								Choose File(s)
+								<input
+									type='file'
+									onChange={onInputChange}
+									id='files'
+									accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+									hidden
+									multiple
+								/>
+							</Button>
+						</Box>
+						<Typography>
+							*You can choose one or multiple files. Only Excel files (.xls,
+							.xlsx) are allowed. Please see{' '}
+							<a href='https://petro.wovodat.org/assets/excels/Sample_Template_New_v3.xlsx'>
+								example file
+							</a>
+							.
+						</Typography>
+					</div>
+				</div>
 
-    return false;
-  };
+				{uploaded > 0 && outstanding[0]
+					&& <div>
+						{!outstanding[0].result
+							&& <div>
+								<LinearProgress />
+							</div>
+						}
+						{outstanding[0].result
+							&& <div>
+								// TODO: add form data
+							</div>
+						}
+						<div className={classes.buttons}>
+							<Button
+								variant='contained'
+								color='primary'
+								className={classes.button}
+								onClick={nextData}
+							>
+								Next
+							</Button>
+						</div>
+					</div>
+				}
 
-  return (
-    <Paper className={classes.paper}>
-      <Typography component='h1' variant='h5' align='center'>
-        New Crystal Data
-      </Typography>
+				{uploaded > 0 && !outstanding[0]
+					&& <div>
+						<div>
+							Saving {processed.length} files?
+						</div>
+						<div className={classes.buttons}>
+							// TODO: change saveData
+							<Button
+								variant='contained'
+								color='primary'
+								className={classes.button}
+								onClick={saveData}
+							>
+								Save
+							</Button>
+						</div>
+					</div>
+				}
 
-      <Stepper activeStep={activeStep} className={classes.stepper}>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-
-      <React.Fragment>
-        <div style={{ position: 'relative' }}>
-          <UploadFile
-            step={0}
-            activeStep={activeStep}
-            // excelFile={excelFile}
-            // excelFile1={excelFile1}
-            excelFileList={excelFileList}
-            // excelFileChange={onExcelFileChange}
-            // excelFileChange1={onExcelFileChange1}
-            excelFileChangeList={onExcelFileChangeList}
-          />
-          <ConfirmData
-            step={1}
-            setJsonData={setJsonDataList}
-            jsonData={jsonDataList[0]}
-            activeStep={activeStep}
-          />
-          <ConfirmData
-            step={2}
-            setJsonData={setJsonDataList}
-            activeStep={activeStep}
-            jsonData={jsonDataList[1]}
-          />
-          <ConfirmData
-            step={3}
-            setJsonData={setJsonDataList}
-            activeStep={activeStep}
-            jsonData={jsonDataList[2]}
-          />
-          {/* <ConfirmData
-            step={2}
-            activeStep={activeStep}
-            jsonData={jsonDataList[1]}
-            setJsonData={setJsonDataList}
-          /> */}
-          {/* <ConfirmData
-            step={1}
-            activeStep={activeStep}
-            jsonData={jsonDataList[0]}
-            setJsonData={setJsonDataList}
-          />
-          // <ConfirmData
-          //   step={2}
-          //   activeStep={activeStep}
-          //   jsonData={jsonDataList[1]}
-          //   setJsonData={setJsonDataList}
-          // /> */}
-          {/* <ConfirmData
-            step={1}
-            activeStep={activeStep}
-            jsonData={jsonDataList[0]}
-            setJsonData={setJsonDataList}
-          />
-          <ConfirmData
-            step={2}
-            activeStep={activeStep}
-            jsonData={jsonDataList[1]}
-            setJsonData={setJsonDataList}
-          /> */}
-          {/* <ConfirmData
-            step={3}
-            activeStep={activeStep}
-            jsonData={jsonDataList[2]}
-            setJsonData={setJsonDataList}
-          /> */}
-        </div>
-        <div className={classes.buttons}>
-          {activeStep !== 0 && (
-            <Button onClick={handleBack} className={classes.button}>
-              Back
-            </Button>
-          )}
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={handleNext}
-            className={classes.button}
-            disabled={disableNext()}
-          >
-            {activeStep === steps.length - 1 ? 'Save' : 'Next'}
-          </Button>
-        </div>
-      </React.Fragment>
-    </Paper>
-  );
+			</React.Fragment>
+		</Paper >
+	);
 }
+
+const queueReducer = (queue: Queue, message: UploadMessage | ProcessingMessage | ProcessedMessage | PopMessage | ClearMessage): Queue => {
+	switch (message.type) {
+		case "upload": return { processed: queue.processed, outstanding: [...queue.outstanding, ...message.files] }
+		case "processing": // Processing `outstanding` head. Refresh
+			return { processed: queue.processed, outstanding: [...queue.outstanding] }
+		case "processed":
+			if (queue.outstanding[0].file === message.file)
+				return { processed: [...queue.processed, message.result], outstanding: queue.outstanding.slice(1) }
+			return queue // Not in the list, ignored
+		case "pop": return { processed: queue.processed.slice(1), outstanding: queue.outstanding }
+		case "clear": return { processed: [], outstanding: [] }
+	}
+}
+
+
+function processEntry(entry: OutstandingEntry) {
+	if (entry.result) return
+
+	const { file, fileName } = entry
+	console.log(fileName)
+	entry.result = excelToJson(entry.file).then((json) => {
+		return { file, result: { fileName, json } }
+	})
+}
+
+
+
+type ProcessedEntry = {
+	fileName: string, json: any,
+}
+type OutstandingEntry = {
+	file: File, fileName: string, result?: Promise<{ file: File, result: ProcessedEntry }>,
+}
+type Queue = { processed: ProcessedEntry[], outstanding: OutstandingEntry[] }
+type UploadMessage = { type: "upload", files: OutstandingEntry[] }
+type ProcessingMessage = { type: "processing" }
+type ProcessedMessage = { type: "processed", file: File, result: ProcessedEntry }
+type PopMessage = { type: "pop" }
+type ClearMessage = { type: "clear" }
+
+// type MongoDBJson = {
+// 	crystal: string,
+// 	type: string,
+// 	axis: string,
+// 	orientation: string,
+// 	mineral: string,
+// 	volcano: string,
+// 	eruption: string,
+// 	reference: string,
+// 	//author: string,
+// 	//doi: string,
+// 	traverse: Traverse[],
+// }
+
+// type Traverse = {
+// 	sio2: string
+// }

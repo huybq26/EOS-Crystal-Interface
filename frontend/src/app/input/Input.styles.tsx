@@ -28,4 +28,22 @@ export const InputStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(3),
         marginLeft: theme.spacing(1),
     },
+
+    fileName: {
+        marginLeft: '10px',
+        alignSelf: 'center',
+        textOverflow: 'ellipsis',
+        marginTop: '10px',
+    },
+    spacing: {
+        margin: '5px',
+        marginTop: '20px',
+    },
+    preview: {
+        width: '80%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'block',
+        maxWidth: '800px',
+    },
 }))
