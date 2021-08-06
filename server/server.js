@@ -18,21 +18,14 @@ app.use('/crystal', crystalRoutes);
 
 // mongoose config
 mongoose.Promise = global.Promise;
-mongoose
-  .connect(config.DB, {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
-  .then(
-    () => {
-      console.log('Database is connected');
-    },
-    (err) => {
-      console.log('Can not connect to the database' + err);
-    }
-  );
+mongoose.connect(config.DB).then(
+  () => {
+    console.log('Database is connected');
+  },
+  (err) => {
+    console.log('Can not connect to the database' + err);
+  }
+);
 
 // CORS handle
 // const app = express();
