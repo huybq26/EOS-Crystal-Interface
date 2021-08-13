@@ -16,37 +16,43 @@ const logger = require('morgan');
 
 // api config
 const app = express();
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(
+  bodyParser.urlencoded({
+    limit: '50mb',
+    extended: true,
+    // parameterLimit: 50000,
+  })
+);
+app.use(cors());
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
-// app.use(logger('dev'));
 
 // mongoose config
 mongoose.Promise = global.Promise;
-mongoose.connect(config.DB).then(
-  () => {
-    console.log('Database is connected');
-  },
-  (err) => {
-    console.log('Can not connect to the database' + err);
-  }
-);
+mongoose
+  .connect(config.DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then(
+    () => {
+      console.log('Database is connected');
+    },
+    (err) => {
+      console.log('Can not connect to the database' + err);
+    }
+  );
 
 // CORS handle
 // const app = express();
 // app.use(bodyParser.json());
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    // limit: '50mb',
-    extended: true,
-    // parameterLimit: 50000,
-  })
-);
-app.use(cors());
 
 app.use('/crystal', crystalRoutes);
 const port = process.env.PORT || 5000;

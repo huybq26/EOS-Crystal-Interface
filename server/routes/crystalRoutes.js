@@ -8,27 +8,32 @@ const upload = multer();
 var Crystal = require('../models/crystal');
 var CrystalSearch = require('../models/crystalSearch');
 
-// crystalRoutes
-//   .route('/upload')
-//   .all(upload.none())
-//   .post(async (req, res) => {
-//     // app.post('/upload', upload.none(), (req, res) => {
-//     const newCrystal = new Crystal(req.body);
-//     // const formData = req.body();
-//     // console.log(req.body);
-//     // const formData = req.body.data;
-//     // console.log('form data', formData);
-//     // res.sendStatus(200);
-//     try {
-//       const crystal = await newCrystal.save();
-//       // res.status(201).send();
-//       res.json(crystal);
-//       console.log('Uploaded!');
-//     } catch (e) {
-//       res.status(400).send(e);
-//       console.log(e);
-//     }
-//   });
+let mineral_array = [];
+let volcano_array = [];
+let eruption_array = [];
+let type_array = [];
+
+const getArray = async () => {
+  const result = await Crystal.find({});
+
+  result.forEach((item) => {
+    if (!mineral_array.includes(item.mineral)) {
+      mineral_array.push(item.mineral);
+    }
+    if (!volcano_array.includes(item.volcano)) {
+      volcano_array.push(item.volcano);
+    }
+    if (!eruption_array.includes(item.eruption)) {
+      eruption_array.push(item.eruption);
+    }
+    if (!type_array.includes(item['type traverse'])) {
+      type_array.push(item['type traverse']);
+    }
+  });
+
+  // res.send(array);
+};
+getArray();
 
 crystalRoutes.route('/upload').post(async (req, res) => {
   // app.post('/upload', upload.none(), (req, res) => {
@@ -68,10 +73,11 @@ crystalRoutes.route('/search').get(async (req, res) => {
   let mineralQuery = [];
   let volcanoQuery = [];
   let eruptionQuery = [];
-  let mineralArray = ['olivine', 'anorthoclase']; // will modify later
-  let volcanoArray = ['Erebus', 'East Pacific Rise', 'Dotsero']; // will modify later
-  let eruptionArray = ['1997', '2005-2006', '4150']; // will modify later
-  let typeArray = ['Rim-to-Rim', 'Rim-to-Core', 'Rim Only', 'None'];
+  // console.log(type_array);
+  let mineralArray = mineral_array; // will modify later
+  let volcanoArray = volcano_array; // will modify later
+  let eruptionArray = eruption_array; // will modify later
+  let typeArray = type_array;
 
   if (req.query.mineral != undefined) {
     mineralQuery = req.query.mineral.toString().split(',');
@@ -169,6 +175,21 @@ crystalRoutes.route('/volcano').get(async (req, res) => {
     result.forEach((item) => {
       if (!array.includes(item.volcano)) {
         array.push(item.volcano);
+      }
+    });
+    res.send(array);
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
+
+crystalRoutes.route('/type').get(async (req, res) => {
+  try {
+    const result = await Crystal.find({});
+    let array = [];
+    result.forEach((item) => {
+      if (!array.includes(item['type traverse'])) {
+        array.push(item['type traverse']);
       }
     });
     res.send(array);
