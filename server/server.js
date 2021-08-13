@@ -2,6 +2,7 @@
 crystalRoutes = require('./routes/crystalRoutes');
 
 // main config
+
 const express = require('express'),
   path = require('path'),
   bodyParser = require('body-parser'),
@@ -11,10 +12,17 @@ const express = require('express'),
 const { constants } = require('crypto');
 const fs = require('fs');
 const crystal = require('./models/crystal');
+const logger = require('morgan');
 
 // api config
 const app = express();
-app.use('/crystal', crystalRoutes);
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+// app.use(logger('dev'));
 
 // mongoose config
 mongoose.Promise = global.Promise;
@@ -30,15 +38,17 @@ mongoose.connect(config.DB).then(
 // CORS handle
 // const app = express();
 // app.use(bodyParser.json());
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
-    limit: '50mb',
+    // limit: '50mb',
     extended: true,
-    parameterLimit: 50000,
+    // parameterLimit: 50000,
   })
 );
 app.use(cors());
+
+app.use('/crystal', crystalRoutes);
 const port = process.env.PORT || 5000;
 
 // Mapping Express Route with Server Route

@@ -2,8 +2,66 @@ var express = require('express');
 var app = express();
 var crystalRoutes = express.Router();
 const fetch = require('node-fetch');
+const multer = require('multer');
+const upload = multer();
 
 var Crystal = require('../models/crystal');
+var CrystalSearch = require('../models/crystalSearch');
+
+// crystalRoutes
+//   .route('/upload')
+//   .all(upload.none())
+//   .post(async (req, res) => {
+//     // app.post('/upload', upload.none(), (req, res) => {
+//     const newCrystal = new Crystal(req.body);
+//     // const formData = req.body();
+//     // console.log(req.body);
+//     // const formData = req.body.data;
+//     // console.log('form data', formData);
+//     // res.sendStatus(200);
+//     try {
+//       const crystal = await newCrystal.save();
+//       // res.status(201).send();
+//       res.json(crystal);
+//       console.log('Uploaded!');
+//     } catch (e) {
+//       res.status(400).send(e);
+//       console.log(e);
+//     }
+//   });
+
+crystalRoutes.route('/upload').post(async (req, res) => {
+  // app.post('/upload', upload.none(), (req, res) => {
+  // console.log(req.body);
+  const newCrystal = new Crystal(
+    // 'crystal name': req.body.name,
+    // 'type traverse': req.body.type,
+    // axis: req.body.axis,
+    // orientation: req.body.orientation,
+    // mineral: req.body.mineral,
+
+    // volcano: req.body.volcano,
+    // eruption: req.body.eruption,
+    // DOI: req.body.DOI,
+    // reference: req.body.reference,
+    // traverse: req.body.traverse,
+    req.body
+  );
+  // const formData = req.body();
+  // console.log(req.body);
+  // const formData = req.body.data;
+  // console.log('form data', formData);
+  // res.sendStatus(200);
+  try {
+    const crystal = await newCrystal.save();
+    res.status(201).send({ newCrystal });
+    // console.log(newCrystal);
+    console.log('Uploaded!');
+  } catch (e) {
+    res.status(400).send(e);
+    console.log(e);
+  }
+});
 
 crystalRoutes.route('/search').get(async (req, res) => {
   // route for boolean search
@@ -40,7 +98,7 @@ crystalRoutes.route('/search').get(async (req, res) => {
   }
 
   try {
-    const crystal = await Crystal.find({
+    const crystal = await CrystalSearch.find({
       $and: [
         {
           mineral: {
@@ -168,7 +226,7 @@ crystalRoutes.route('/').get(async (req, res) => {
     keyword5 = req.query.q5;
   }
   try {
-    const crystal = await Crystal.find({
+    const crystal = await CrystalSearch.find({
       $and: [
         {
           $or: [
@@ -236,13 +294,13 @@ crystalRoutes.route('/').get(async (req, res) => {
   }
 });
 
-crystalRoutes.route('/').post(async (req, res) => {
-  const newCrystal = new Crystal(req.body);
+crystalRoutes.route('/show').get(async (req, res) => {
   try {
-    await newCrystal.save();
-    res.status(201).send();
+    const data = await Crystal.find({});
+    res.send({ data });
   } catch (e) {
-    res.status(400).send(e);
+    console.log(e);
+    res.status(500).send('Server Error');
   }
 });
 
