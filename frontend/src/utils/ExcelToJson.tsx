@@ -14,9 +14,9 @@ async function getCSVfromFile(excelFile: File) {
 
     reader.onload = (event) => {
       const bstr = event.target?.result;
-      const workbook = XLSX.read(bstr, { type: 'binary' }); 
+      const workbook = XLSX.read(bstr, { type: 'binary' });
       let worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const csv = XLSX.utils.sheet_to_csv(worksheet, { FS: '~' }); 
+      const csv = XLSX.utils.sheet_to_csv(worksheet, { FS: '~' });
       resolve(csv);
     };
 
@@ -30,25 +30,117 @@ function convertCSVtoJson(csv: String) {
   let lines = csv.split('\n');
   let json = [];
   let headers = lines[0].split('~');
-
-  let common: { [key: string]: any } = {}; 
-  let firstLine = lines[1].split('~');
-  for (let i = 0; i < 8; i++) {
-    common[headers[i]] = firstLine[i]; 
+  let case_number = 1;
+  for (let i = 0; i < headers.length; i++) {
+    if (
+      headers[i].toString().trim() == 'a //(100)' ||
+      headers[i].toString().trim() == 'b //(010)' ||
+      headers[i].toString().trim() == 'c //(001)'
+    ) {
+      case_number = 2; // when orientation exist
+    }
   }
-  json.push(common);
-  json[0]['traverse'] = [];
+  if (case_number == 1) {
+    let common: { [key: string]: any } = {};
+    let firstLine = lines[1].split('~');
+    for (let i = 0; i < 7; i++) {
+      if (i == 3) {
+        common['a //(100)'] = 'none';
+        common['b //(010)'] = 'none';
+        common['c //(001)'] = 'none';
+      }
+      common[headers[i]] = firstLine[i];
+    }
+    if (common['crystal name'].toString().trim() == '') {
+      common['crystal name'] = 'none';
+    }
+    if (common['mineral'].toString().trim() == '') {
+      common['mineral'] = 'none';
+    }
+    if (common['volcano'].toString().trim() == '') {
+      common['volcano'] = 'none';
+    }
+    if (common['eruption'].toString().trim() == '') {
+      common['eruption'] = 'none';
+    }
+    if (common['axis'].toString().trim() == '') {
+      common['axis'] = 'none';
+    }
+    if (common['reference'].toString().trim() == '') {
+      common['reference'] = 'none';
+    }
+    json.push(common);
+    // console.log(common);
+    // json.push({
+    //   'a //(100)': 'none',
+    //   'b //(010)': 'none',
+    //   'c //(001)': 'none',
+    // });
 
-  for (let i = 1; i < lines.length; i++) {
-    let obj: { [key: string]: any } = {};
-    let currentline = lines[i].split('~');
+    json[0]['traverse'] = [];
 
-    for (let j = 8; j < headers.length; j++) {
-      obj[headers[j]] = currentline[j]; 
+    for (let i = 1; i < lines.length; i++) {
+      let obj: { [key: string]: any } = {};
+      let currentline = lines[i].split('~');
+
+      for (let j = 7; j < headers.length; j++) {
+        obj[headers[j]] = currentline[j];
+      }
+
+      json[0]['traverse'].push(obj);
     }
 
-    json[0]['traverse'].push(obj);
+    console.log(json);
+    // return json;
+  } else if (case_number == 2) {
+    let common: { [key: string]: any } = {};
+    let firstLine = lines[1].split('~');
+    for (let i = 0; i < 10; i++) {
+      common[headers[i]] = firstLine[i];
+    }
+    if (common['a //(100)'].toString().trim() == '') {
+      common['a //(100)'] = 'none';
+    }
+    if (common['b //(010)'].toString().trim() == '') {
+      common['b //(010)'] = 'none';
+    }
+    if (common['c //(001)'].toString().trim() == '') {
+      common['c //(001)'] = 'none';
+    }
+    if (common['crystal name'].toString().trim() == '') {
+      common['crystal name'] = 'none';
+    }
+    if (common['mineral'].toString().trim() == '') {
+      common['mineral'] = 'none';
+    }
+    if (common['volcano'].toString().trim() == '') {
+      common['volcano'] = 'none';
+    }
+    if (common['eruption'].toString().trim() == '') {
+      common['eruption'] = 'none';
+    }
+    if (common['axis'].toString().trim() == '') {
+      common['axis'] = 'none';
+    }
+    if (common['reference'].toString().trim() == '') {
+      common['reference'] = 'none';
+    }
+    json.push(common);
+
+    json[0]['traverse'] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      let obj: { [key: string]: any } = {};
+      let currentline = lines[i].split('~');
+
+      for (let j = 10; j < headers.length; j++) {
+        obj[headers[j]] = currentline[j];
+      }
+
+      json[0]['traverse'].push(obj);
+    }
+
+    console.log(json);
   }
-  console.log(json);
   return json;
 }

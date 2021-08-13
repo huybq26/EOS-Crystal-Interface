@@ -21,14 +21,10 @@ import { exportExcelFile } from '../../utils/JsonToExcel';
 import exportJsonFile from '../../utils/JsonExport';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Globals from '../../globals';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize='small' />;
 const checkedIcon = <CheckBoxIcon fontSize='small' />;
-
-let mineralArray = ['Olivine', 'Anorthoclase'];
-let volcanoArray = ['Erebus', 'East Pacific Rise', 'Dotsero'];
-let eruptionArray = ['1997', '2005-2006', '4150'];
-let typeArray = ['Rim-to-Rim', 'Rim-to-Core', 'Rim Only', 'None'];
 
 function BooleanSearch() {
   const classes = useStyles();
@@ -42,40 +38,69 @@ function BooleanSearch() {
   const [volcano, setVolcano] = useState([]);
   const [eruption, setEruption] = useState([]);
   const [type, setType] = useState([]);
-
+  const [mineralArray, setMineralArray] = useState([]);
+  const [volcanoArray, setVolcanoArray] = useState([]);
+  const [eruptionArray, setEruptionArray] = useState([]);
+  const [typeArray, setTypeArray] = useState([]);
   // const handleOption = (event) => {
   //   setOptionState({
   //     ...optionState,
   //     [event.target.name]: event.target.checked,
   //   });
   // };
+  // let mineralArray = [];
+  // let volcanoArray = [];
+  // let eruptionArray = [];
+  // let typeArray = [];
+  const dataRetrieve = async () => {
+    const host = Globals().crystalHost;
+    try {
+      let mineral = await fetch(host + '/crystal/mineral', {
+        method: 'GET',
+      });
+      let volcano = await fetch(host + '/crystal/volcano', {
+        method: 'GET',
+      });
+      let eruption = await fetch(host + '/crystal/eruption', {
+        method: 'GET',
+      });
+      let type = await fetch(host + '/crystal/type', {
+        method: 'GET',
+      });
+      setMineralArray(await mineral.json());
+      setVolcanoArray(await volcano.json());
+      setEruptionArray(await eruption.json());
+      setTypeArray(await type.json());
+      console.log('running');
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
-  // useEffect(() => {
-  //   mineralArray = fetch("/crystal/mineral")
-  //   volcanoArray = fetch("/crystal/volcano")
-  //   eruptionArray = fetch("/crystal/eruption")
-  // },[mineral])
+  useEffect(() => {
+    dataRetrieve();
+  }, []);
 
   const onMineralChange = (event, values) => {
     setMineral(values);
   };
-  console.log(mineral);
+  // console.log(mineral);
 
   const onVolcanoChange = (event, values) => {
     setVolcano(values);
   };
-  console.log(volcano);
+  // console.log(volcano);
 
   const onEruptionChange = (event, values) => {
     setEruption(values);
   };
-  console.log(eruption);
+  // console.log(eruption);
 
   const onTypeChange = (event, values) => {
     setType(values);
   };
-  console.log(type);
-  console.log(mineral.length);
+  // console.log(type);
+  // console.log(mineral.length);
 
   const handleClear = () => {
     // setMineral([]);
@@ -88,7 +113,6 @@ function BooleanSearch() {
     const value = event.target.value;
     setTextInput(value);
   };
-  console.log(eruption.forEach((element) => console.log(`,${element},`)));
   let jsonList = [];
 
   const handleSubmit = (event) => {

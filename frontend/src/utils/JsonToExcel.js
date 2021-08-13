@@ -18,8 +18,8 @@ export function exportExcelFile(json) {
     s[a] = traverses[a][Object.keys(traverses[a])];
     return s;
   }, {}); // reduce function to simplify the data structure of traverses
-  console.log(newObj[1]);
-  console.log(newObj[1][1]);
+  // console.log(newObj[1]);
+  // console.log(newObj[1][1]);
 
   // Add information of the first object. Note that the newObj[0] is undefined, so start from newObj[1]
   XLSX.utils.sheet_add_json(ws, [newObj[1][0]], {
@@ -27,7 +27,8 @@ export function exportExcelFile(json) {
     skipHeader: false,
   }); // both row 1 and 2 are occupied by information and spot location 0.
   let location_index = 3; // start from row 3
-  for (let j = 1; j <= 1000; j = j + 1) {
+  console.log(newObj[1]);
+  for (let j = 1; j <= 2000; j = j + 1) {
     // depends on how we store the data. If the key is also the same as the spot location, it will be very complicated. A suggestion is to put the key as increasing natural numbers only.
     let location = 'I' + location_index; // e.g.: I3
     if (newObj[1][j]) {
@@ -44,15 +45,15 @@ export function exportExcelFile(json) {
     // add information of object 2,3,4,...
     XLSX.utils.sheet_add_json(ws, [json[i - 1]], {
       origin: 'A' + location_index,
-      skipHeader: true,
+      skipHeader: false,
     });
 
     XLSX.utils.sheet_add_json(ws, [newObj[i][0]], {
       origin: 'I' + location_index,
-      skipHeader: true,
+      skipHeader: false,
     });
     location_index += 1;
-    for (let j = 1; j <= 1000; j = j + 1) {
+    for (let j = 1; j <= 2000; j = j + 1) {
       let location = 'I' + location_index;
       if (newObj[i][j]) {
         XLSX.utils.sheet_add_json(ws, [newObj[i][j]], {

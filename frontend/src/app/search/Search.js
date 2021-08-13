@@ -86,6 +86,7 @@ function Search() {
         const result = await fetch(url);
         const json = await result.json();
         setSearchData(json);
+        console.log(json);
         jsonList = json;
         setButtonClicked(false);
         console.log(url);
