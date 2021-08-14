@@ -14,6 +14,10 @@ import {
   TableCell,
   TablePagination,
   Button,
+  FormControl,
+  InputLabel,
+  Input,
+  InputAdornment,
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -31,22 +35,24 @@ function Search() {
   const [submitText, setSubmitText] = useState('');
   const [searchData, setSearchData] = useState([]);
   const [buttonClicked, setButtonClicked] = useState(false);
+  const [searchFirstTime, setSearchFirstTime] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchForText, setSearchForText] = useState('');
   const [resultURL, setResultURL] = useState('');
   const handleChange = (event) => {
     const value = event.target.value;
-    setTextInput(value);
+    setTextInput(value.toString().trim());
   };
   let jsonList = [];
 
   const handleSubmit = (event) => {
     const value = event.target.value;
     event.preventDefault();
-    setSubmitText(value);
-    setSearchForText(textInput);
+    setSubmitText(textInput.trim());
+    setSearchForText(textInput.trim());
     setButtonClicked(true);
+    setSearchFirstTime(true);
     console.log(textInput);
 
     let arraySearch = [];
@@ -95,6 +101,15 @@ function Search() {
       }
     };
     fetchData();
+  };
+
+  const excelExport = () => {
+    document.getElementById('search-button').click();
+
+    exportExcelFile(searchData);
+
+    // console.log(submitText);
+    // setSearchData(submitText);
   };
   const Loader = () => {
     if (buttonClicked) {
@@ -145,6 +160,12 @@ function Search() {
     { id: 'eruption', label: 'Eruption Year', minWidth: 120, align: 'left' },
   ];
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      document.getElementById('search-button').click();
+    }
+  };
+
   return (
     <Paper>
       <Typography
@@ -175,24 +196,37 @@ function Search() {
           Please search with keywords seperated by "and", e.g. Erebus and 1997:
         </i>
       </Typography>
-      <IconButton aria-label='menu' style={{ marginLeft: 60, marginTop: 10 }}>
-        <MenuIcon />
-      </IconButton>
-      <TextField
-        onChange={handleChange}
-        margin='normal'
-        // id='crystal-name'
-        placeholder='Search Database'
-      ></TextField>
-      <IconButton
-        type='submit'
-        className={classes.iconButton}
-        aria-label='search'
-        onClick={handleSubmit}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          marginLeft: 80,
+          marginTop: 20,
+        }}
+        id='search-input'
       >
-        <SearchIcon />
-      </IconButton>
-      <Divider orientation='vertical' />
+        <div style={{ width: 400, height: 60 }}>
+          <FormControl fullWidth variant='outlined'>
+            <TextField
+              onChange={handleChange}
+              margin='normal'
+              placeholder=' Search Crystal Database (e.g. Dotsero and 4150)'
+              onKeyDown={handleKeyDown}
+            ></TextField>
+          </FormControl>
+        </div>
+        <div>
+          <IconButton
+            type='submit'
+            className={classes.iconButton}
+            aria-label='search'
+            id='search-button'
+            onClick={handleSubmit}
+          >
+            <SearchIcon fontSize='large' />
+          </IconButton>
+        </div>
+      </div>
 
       <br></br>
 
@@ -232,7 +266,9 @@ function Search() {
                 Export data in JSON
               </Button>
               <Button
-                onClick={() => exportExcelFile(searchData)}
+                onClick={() => {
+                  excelExport();
+                }}
                 style={{
                   borderRadius: 35,
                   backgroundColor: '#34bf24',
@@ -309,9 +345,30 @@ function Search() {
           </Typography>
         ) : (
           // 'No result found.'
+
           <div>
             <br></br>
+            {searchFirstTime ? (
+              <div>
+                <Typography
+                  component='h3'
+                  variant='h6'
+                  align='center'
+                  style={{ marginBottom: 10 }}
+                >
+                  No search result found for "{searchForText}".
+                </Typography>
+              </div>
+            ) : (
+              <div>
+                <Typography component='h3' variant='h5' align='center'>
+                  Search results:
+                </Typography>
+              </div>
+            )}
+
             <br></br>
+
             <TableContainer className={classes.tableContainer}>
               <Table stickyHeader aria-label='sticky table'>
                 <TableHead>

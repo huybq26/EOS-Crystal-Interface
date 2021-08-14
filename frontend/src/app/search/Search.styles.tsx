@@ -74,12 +74,13 @@ export const useStyles = makeStyles((theme) => ({
   booleanContainer: {
     display: 'flex',
     flexDirection: 'column',
+    marginTop: -10,
   },
   optionContainer: {
     display: 'flex',
     flexDirection: 'row',
     marginLeft: 80,
-    marginTop: 25,
+    marginTop: 3,
   },
   optionText: {
     fontWeight: 'bold',

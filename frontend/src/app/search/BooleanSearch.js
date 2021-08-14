@@ -31,6 +31,7 @@ function BooleanSearch() {
   const history = useHistory();
   const [textInput, setTextInput] = useState('');
   const [searchData, setSearchData] = useState([]);
+  const [searchFirstTime, setSearchFirstTime] = useState(false);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -77,6 +78,15 @@ function BooleanSearch() {
     }
   };
 
+  const excelExport = () => {
+    document.getElementById('search-button').click();
+
+    exportExcelFile(searchData);
+
+    // console.log(submitText);
+    // setSearchData(submitText);
+  };
+
   useEffect(() => {
     dataRetrieve();
   }, []);
@@ -118,6 +128,7 @@ function BooleanSearch() {
   const handleSubmit = (event) => {
     const value = event.target.value;
     event.preventDefault();
+    setSearchFirstTime(true);
     setButtonClicked(true);
 
     let mineralString = '&mineral=';
@@ -383,6 +394,7 @@ function BooleanSearch() {
           color='primary'
           onClick={handleSubmit}
           className={classes.button}
+          id='search-button'
         >
           Search
         </Button>
@@ -423,7 +435,7 @@ function BooleanSearch() {
                 Export data in JSON
               </Button>
               <Button
-                onClick={() => exportExcelFile(searchData)}
+                onClick={() => excelExport()}
                 style={{
                   borderRadius: 35,
                   backgroundColor: '#34bf24',
@@ -502,6 +514,24 @@ function BooleanSearch() {
           // 'No result found.'
           <div>
             <br></br>
+            {searchFirstTime ? (
+              <div>
+                <Typography
+                  component='h3'
+                  variant='h6'
+                  align='center'
+                  style={{ marginBottom: 10 }}
+                >
+                  No search result found.
+                </Typography>
+              </div>
+            ) : (
+              <div>
+                <Typography component='h3' variant='h5' align='center'>
+                  Search results:
+                </Typography>
+              </div>
+            )}
             <br></br>
             <TableContainer className={classes.tableContainer}>
               <Table stickyHeader aria-label='sticky table'>
