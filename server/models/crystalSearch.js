@@ -2,18 +2,18 @@ const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var traverse = new Schema({
-  location: String,
-  an: String,
-  comments: String,
-  sio2: String,
-  al2o3: String,
-  cao: String,
-  na2o: String,
-  k2o: String,
-  feo: String,
-  total: String,
-  ab: String,
-  or: String,
+  location: Number,
+  an: Number,
+  comments: Number,
+  sio2: Number,
+  al2o3: Number,
+  cao: Number,
+  na2o: Number,
+  k2o: Number,
+  feo: Number,
+  total: Number,
+  ab: Number,
+  or: Number,
 });
 
 var crystalSearch = new Schema(

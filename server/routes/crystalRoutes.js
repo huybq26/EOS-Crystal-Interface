@@ -35,10 +35,14 @@ const getArray = async () => {
 };
 getArray();
 
-let dataChangeDetect = CrystalSearch.watch();
-dataChangeDetect.on('change', (next) => {
-  console.log('received a change to the collection: \t');
-}); // somehow fixed the problem of slowly updating in Boolean Search
+// let dataChangeDetect = CrystalSearch.watch();
+// dataChangeDetect.on('change', (next) => {
+//   console.log('received a change to the collection: \t');
+// }); // somehow fixed the problem of slowly updating in Boolean Search
+// let dataChangeDetect2 = CrystalSearch.watch();
+// dataChangeDetect2.on('change', (next) => {
+//   console.log('received a change to the collection: \t');
+// }); // somehow fixed the problem of slowly updating in Boolean Search
 
 crystalRoutes.route('/upload').post(async (req, res) => {
   // app.post('/upload', upload.none(), (req, res) => {
