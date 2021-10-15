@@ -15,6 +15,7 @@
     "@types/react-dom": "^16.9.10",
     "@types/react-router-dom": "^5.1.7",
     "axios": "^0.21.1",
+    "node-fetch": "^2.6.1",
     "express": "^4.17.1",
     "js-cookie": "^2.2.1",
     "mongo": "^0.1.0",
@@ -52,5 +53,5 @@
     ],
     "test-watch": "nodemon -e ts,tsx -w ./ -x npm run test"
   },
-    "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:3001"
 }

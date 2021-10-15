@@ -1,24 +1,41 @@
-import Globals from "../globals";
+import Globals from '../globals';
 
-export enum methodType {get = 'GET', post = 'POST', put = 'PUT', delete = 'DELETE'}
+export enum methodType {
+  get = 'GET',
+  post = 'POST',
+  put = 'PUT',
+  delete = 'DELETE',
+}
 
 export default class BaseAPI {
+  public static JSONRequest(
+    api: string,
+    method: methodType,
+    headers: Record<string, string>,
+    options: object,
+    content: object
+  ) {
+    const host = Globals().host;
 
-    public static JSONRequest(api: string, method: methodType, headers: Record<string, string>, options: object, content: object) {
-        const host = Globals().host;
+    let requestOptions: any = {
+      method: method,
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+        // 'Access-Control-Allow-Origin': '*',
+        // 'Access-Control-Allow-Headers': 'X-Requested-With',
+        // 'Access-Control-Allow-Headers': 'Content-Type'
+      },
+      ...options,
+    };
 
-        let requestOptions: any = {
-            method: method,
-            headers: {...headers, 'Content-Type': 'application/json'},
-            ...options
-        }
-
-        if (method === methodType.post || method === methodType.put) {
-            requestOptions.body = JSON.stringify(content)
-        }
-
-        // @ts-ignore
-        return fetch(host + api, requestOptions)
-            .then(response => response.json())
+    if (method === methodType.post || method === methodType.put) {
+      requestOptions.body = JSON.stringify(content);
     }
+
+    // @ts-ignore
+    return fetch(host + api, requestOptions).then((response) =>
+      response.json()
+    );
+  }
 }

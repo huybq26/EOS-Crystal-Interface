@@ -51,22 +51,22 @@ function convertCSVtoJson(csv: String) {
       }
       common[headers[i]] = firstLine[i];
     }
-    if (common['crystal name'].toString().trim() == '') {
+    if (common['crystal name']?.toString().trim() == '') {
       common['crystal name'] = 'none';
     }
-    if (common['mineral'].toString().trim() == '') {
+    if (common['mineral']?.toString().trim() == '') {
       common['mineral'] = 'none';
     }
-    if (common['volcano'].toString().trim() == '') {
+    if (common['volcano']?.toString().trim() == '') {
       common['volcano'] = 'none';
     }
-    if (common['eruption'].toString().trim() == '') {
+    if (common['eruption']?.toString().trim() == '') {
       common['eruption'] = 'none';
     }
-    if (common['axis'].toString().trim() == '') {
+    if (common['axis']?.toString().trim() == '') {
       common['axis'] = 'none';
     }
-    if (common['reference'].toString().trim() == '') {
+    if (common['reference']?.toString().trim() == '') {
       common['reference'] = 'none';
     }
     json.push(common);
@@ -84,7 +84,18 @@ function convertCSVtoJson(csv: String) {
       let currentline = lines[i].split('~');
 
       for (let j = 7; j < headers.length; j++) {
-        obj[headers[j]] = currentline[j];
+        // obj[headers[j]] = currentline[j];
+        if (headers[j] == 'spot location  (um)') {
+          headers[j] = 'spot location(um)';
+        }
+        if (headers[j] == 'Fo (mol %)') {
+          headers[j] = 'Fo(mol%)';
+        }
+        //console.log("Hello I'm processing here!");
+
+        headers[j] = headers[j].trim();
+        //console.log('Header is: ' + headers[j]);
+        obj[headers[j]] = parseFloat(currentline[j]);
       }
 
       json[0]['traverse'].push(obj);
@@ -134,7 +145,16 @@ function convertCSVtoJson(csv: String) {
       let currentline = lines[i].split('~');
 
       for (let j = 10; j < headers.length; j++) {
-        obj[headers[j]] = currentline[j];
+        if (headers[j] == 'spot location  (um)') {
+          headers[j] = 'spot location (um)';
+        }
+        if (headers[j] == 'Fo (mol %)') {
+          headers[j] = 'Fo(mol%)';
+        }
+
+        headers[j] = headers[j].trim();
+        console.log('Header is: ' + headers[j]);
+        obj[headers[j]] = parseFloat(currentline[j].trim());
       }
 
       json[0]['traverse'].push(obj);

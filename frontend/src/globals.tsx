@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 export default function Globals() {
-    return {
-        host: "http://localhost:4000",
-        crystalHost: "http://localhost:5000"
-    }
+  return {
+    host: 'http://localhost:3001',
+    crystalHost: 'http://localhost:3001',
+  };
 }

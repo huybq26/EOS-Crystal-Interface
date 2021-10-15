@@ -20,10 +20,28 @@ import { excelToJson } from '../../utils/ExcelToJson';
 import DataUploadAPI from '../../api/dataUpload.api';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import FadeIn from 'react-fade-in';
+import AuthService from '../../services/auth.service';
+
+interface UserData {
+  username: string;
+  password: string;
+  prevState: null;
+}
 
 export default function Input() {
   const classes = InputStyles();
   const history = useHistory();
+
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const user = AuthService.getCurrentUser();
+
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, []);
 
   const [{ processed, outstanding }, dispatchQueue] = React.useReducer(
     // processed is of processEntry type (single file)
@@ -161,7 +179,7 @@ export default function Input() {
       };
 
       try {
-        axios.post('http://localhost:5000/crystal/upload', crystal_upload);
+        axios.post('/crystal/upload', crystal_upload);
         // console.log(crystal_upload);
       } catch (e) {
         console.error(e);
@@ -247,101 +265,150 @@ export default function Input() {
     }
   };
 
+  // console.log(outstanding);
+
   //____________________________________________________________________________________________________________________//
 
   return (
     <Paper className={classes.paper}>
-      <Typography component='h1' variant='h5' align='center'>
-        New Crystal Data
-      </Typography>
-
-      <React.Fragment>
-        {/* {clicked == 0 && ( */}
-        <div style={{ position: 'relative' }}>
-          <div
-            style={
-              uploaded <= 0 || clicked == 0
-                ? { display: 'block' }
-                : { display: 'none' }
-            }
-          >
-            <Box className={classes.spacing} display='flex'>
-              <Button variant='contained' component='label'>
-                Choose File(s)
-                <input
-                  type='file'
-                  onChange={onInputChange}
-                  id='files'
-                  accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
-                  hidden
-                  multiple
-                />
-              </Button>
-            </Box>
-            <Typography>
-              *You can choose one or multiple files. Only Excel files (.xls,
-              .xlsx) are allowed. Please see{' '}
-              <a href='https://petro.wovodat.org/assets/excels/Sample_Template_New_v3.xlsx'>
-                example file
-              </a>
-              .
-            </Typography>
+      <FadeIn>
+        <Typography component='h1' variant='h5' align='center'>
+          New Crystal Data
+        </Typography>
+        {currentUser ? (
+          <div style={{ position: 'relative' }}>
             <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                marginRight: 10,
-              }}
+              style={
+                uploaded <= 0 || clicked == 0
+                  ? { display: 'block' }
+                  : { display: 'none' }
+              }
             >
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={handleClicked}
+              <Box className={classes.spacing} display='flex'>
+                <Button variant='contained' component='label'>
+                  Choose File(s)
+                  <input
+                    type='file'
+                    onChange={onInputChange}
+                    id='files'
+                    accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+                    hidden
+                    multiple
+                  />
+                </Button>
+              </Box>
+              <div style={{ marginLeft: 10, marginTop: 20 }}>
+                {outstanding.length == 0 ? (
+                  <Typography>
+                    *You can choose one or multiple files. Only Excel files
+                    (.xls, .xlsx) are allowed. Please see{' '}
+                    <a
+                      href='https://source.wovodat.org/static/data-template.xlsx'
+                      //href='../assets/data-template.xlsx'
+                      download='data-template.xlsx'
+                    >
+                      data template and guides
+                    </a>
+                    .
+                    <br />
+                    <a
+                      href='https://source.wovodat.org/static/Etna_2015-2016_ol_Cannata2018_6.xlsx'
+                      // href='../assets/Etna_2015-2016_ol_Cannata2018_6.xlsx'
+                      download='Etna_2015-2016_ol_Cannata2018_6.xlsx'
+                    >
+                      Example file 1
+                    </a>
+                    <br />
+                    <a
+                      href='https://source.wovodat.org/static/Kilauea_1959_ol_Fabbrizio2019_2_(only axis).xlsx'
+                      // href='../../assets/Kilauea_1959_ol_Fabbrizio2019_2_(only axis).xlsx'
+                      download='Kilauea_1959_ol_Fabbrizio2019_2_(only axis).xlsx'
+                    >
+                      Example file 2
+                    </a>
+                  </Typography>
+                ) : (
+                  <Typography>
+                    {outstanding.length} files uploaded successfully.
+                    <Typography>
+                      Please click "Next" button to modify (if necessary) and
+                      upload data.
+                    </Typography>
+                  </Typography>
+                )}
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginRight: 10,
+                }}
               >
-                Submit
-              </Button>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={handleClicked}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-        {/* )} */}
+        ) : (
+          <div style={{ marginTop: 20, marginBottom: 20 }}>
+            <Typography component='h3'>
+              To contribute new crystal data, please <a href='/login'>log in</a>{' '}
+              first.
+            </Typography>
+          </div>
+        )}
+        <React.Fragment>
+          {/* {clicked == 0 && ( */}
 
-        {uploaded > 0 && outstanding[0] && clicked == 1 && (
-          <div>
-            {!outstanding[0].result && (
-              <div>
-                <LinearProgress />
-              </div>
-            )}
-            {outstanding[0].result && (
-              <div style={{ marginTop: 25 }}>
-                {/* // TODO: add form data */}
+          {/* )} */}
+
+          {uploaded > 0 && outstanding[0] && clicked == 1 && (
+            <div>
+              {!outstanding[0].result && (
                 <div>
-                  <Box display='flex'>
-                    <Grid container spacing={1}>
-                      <Grid item sm>
-                        <FormGroup /* className= {classes.formLabel}*/>
-                          <FormControl style={{ marginBottom: 20 }}>
-                            <InputLabel shrink={true}>Crystal Name</InputLabel>
-                            <TextField
-                              onChange={handleChange}
-                              name='crystalNameInput'
-                              margin='normal'
-                              // id='crystal-name'
-                              value={crystalNameInput}
-                            ></TextField>
-                          </FormControl>
-                          <FormControl>
-                            <InputLabel shrink={true}>Mineral Name</InputLabel>
-                            <TextField
-                              onChange={handleChange}
-                              name='mineralNameInput'
-                              margin='normal'
-                              // id='crystal-name'
-                              //   label='Mineral name'
-                              value={mineralNameInput}
-                            ></TextField>
-                          </FormControl>
-                          {/* <FormControl style={{ marginBottom: 20 }}>
+                  <LinearProgress />
+                </div>
+              )}
+              {outstanding[0].result && (
+                <div style={{ marginTop: 25 }}>
+                  {/* // TODO: add form data */}
+                  <div>
+                    <Box display='flex'>
+                      <Grid container spacing={1}>
+                        <Grid item sm>
+                          <FormGroup /* className= {classes.formLabel}*/>
+                            <FormControl style={{ marginBottom: 20 }}>
+                              <InputLabel shrink={true}>
+                                Crystal Name
+                              </InputLabel>
+                              <TextField
+                                onChange={handleChange}
+                                name='crystalNameInput'
+                                margin='normal'
+                                // id='crystal-name'
+                                value={crystalNameInput}
+                              ></TextField>
+                            </FormControl>
+                            <FormControl>
+                              <InputLabel shrink={true}>
+                                Mineral Name
+                              </InputLabel>
+                              <TextField
+                                onChange={handleChange}
+                                name='mineralNameInput'
+                                margin='normal'
+                                // id='crystal-name'
+                                //   label='Mineral name'
+                                value={mineralNameInput}
+                              ></TextField>
+                            </FormControl>
+                            {/* <FormControl style={{ marginBottom: 20 }}>
                             <InputLabel>Mineral Name</InputLabel>
                             <NativeSelect
                               name='mineralNameInput'
@@ -352,158 +419,166 @@ export default function Input() {
                               <option value='Anorthoclase'>Anorthoclase</option>
                             </NativeSelect>
                           </FormControl> */}
-                          <FormControl style={{ marginTop: 20 }}>
-                            <InputLabel shrink={true}>Volcano Name</InputLabel>
-                            <TextField
-                              onChange={handleChange}
-                              name='volcanoNameInput'
-                              margin='normal'
-                              // id='crystal-name'
-                              value={volcanoNameInput}
-                            ></TextField>
-                          </FormControl>
+                            <FormControl style={{ marginTop: 20 }}>
+                              <InputLabel shrink={true}>
+                                Volcano Name
+                              </InputLabel>
+                              <TextField
+                                onChange={handleChange}
+                                name='volcanoNameInput'
+                                margin='normal'
+                                // id='crystal-name'
+                                value={volcanoNameInput}
+                              ></TextField>
+                            </FormControl>
 
-                          <FormControl style={{ marginTop: 20 }}>
-                            <InputLabel shrink={true}>Type Traverse</InputLabel>
-                            <TextField
-                              onChange={handleChange}
-                              name='typeTraverse'
-                              margin='normal'
-                              // id='crystal-name'
-                              value={typeTraverse}
-                            ></TextField>
-                          </FormControl>
-                        </FormGroup>
-                      </Grid>
+                            <FormControl style={{ marginTop: 20 }}>
+                              <InputLabel shrink={true}>
+                                Type Traverse
+                              </InputLabel>
+                              <TextField
+                                onChange={handleChange}
+                                name='typeTraverse'
+                                margin='normal'
+                                // id='crystal-name'
+                                value={typeTraverse}
+                              ></TextField>
+                            </FormControl>
+                          </FormGroup>
+                        </Grid>
 
-                      <Grid item sm className={classes.grid2}>
-                        <FormGroup>
-                          <FormControl style={{ marginBottom: 19 }}>
-                            <InputLabel shrink={true}>Eruption Year</InputLabel>
+                        <Grid item sm className={classes.grid2}>
+                          <FormGroup>
+                            <FormControl style={{ marginBottom: 19 }}>
+                              <InputLabel shrink={true}>
+                                Eruption Year
+                              </InputLabel>
+                              <TextField
+                                onChange={handleChange}
+                                name='eruptionYearInput'
+                                margin='normal'
+                                // id='crystal-name'
+                                value={eruptionYearInput}
+                              ></TextField>
+                            </FormControl>
+                            <FormControl style={{ marginBottom: 8 }}>
+                              <InputLabel shrink={true}>Reference</InputLabel>
+                              <TextField
+                                onChange={handleChange}
+                                name='referenceInput'
+                                fullWidth
+                                margin='normal'
+                                // id='author-name'
+                                value={referenceInput}
+                              ></TextField>
+                            </FormControl>
+
                             <TextField
                               onChange={handleChange}
-                              name='eruptionYearInput'
-                              margin='normal'
-                              // id='crystal-name'
-                              value={eruptionYearInput}
-                            ></TextField>
-                          </FormControl>
-                          <FormControl style={{ marginBottom: 8 }}>
-                            <InputLabel shrink={true}>Reference</InputLabel>
-                            <TextField
-                              onChange={handleChange}
-                              name='referenceInput'
+                              name='researchTitle'
                               fullWidth
                               margin='normal'
-                              // id='author-name'
-                              value={referenceInput}
+                              // id='crystal-name'
+                              label='Research Title'
+                              value={researchTitle}
                             ></TextField>
-                          </FormControl>
-
-                          <TextField
-                            onChange={handleChange}
-                            name='researchTitle'
-                            fullWidth
-                            margin='normal'
-                            // id='crystal-name'
-                            label='Research Title'
-                            value={researchTitle}
-                          ></TextField>
-                          <TextField
-                            onChange={handleChange}
-                            name='doiInput'
-                            fullWidth
-                            margin='normal'
-                            // id='doi'
-                            label='Digital Object Identifier'
-                            value={doiInput}
-                          ></TextField>
-                        </FormGroup>
+                            <TextField
+                              onChange={handleChange}
+                              name='doiInput'
+                              fullWidth
+                              margin='normal'
+                              // id='doi'
+                              label='Digital Object Identifier'
+                              value={doiInput}
+                            ></TextField>
+                          </FormGroup>
+                        </Grid>
                       </Grid>
-                    </Grid>
-                  </Box>
+                    </Box>
+                  </div>
                 </div>
+              )}
+              <div className={classes.buttons}>
+                {/* <Button
+                  variant='contained'
+                  color='secondary'
+                  className={classes.button}
+                  onClick={removeCurrent}
+                >
+                  Delete
+                </Button> */}
+                <Button
+                  variant='contained'
+                  color='secondary'
+                  className={classes.button}
+                  onClick={nextData}
+                >
+                  Next
+                </Button>
               </div>
-            )}
-            <div className={classes.buttons}>
-              <Button
-                variant='contained'
-                color='secondary'
-                className={classes.button}
-                onClick={removeCurrent}
-              >
-                Delete
-              </Button>
-              <Button
-                variant='contained'
-                color='secondary'
-                className={classes.button}
-                onClick={nextData}
-              >
-                Next
-              </Button>
             </div>
-          </div>
-        )}
+          )}
 
-        {uploaded > 0 && !outstanding[0] && submitted == 0 && (
-          <div>
-            <div>Saving {processed.length} files?</div>
-            <div className={classes.buttons}>
-              {/* // TODO: change saveData */}
-              <Button
-                variant='contained'
-                color='primary'
-                className={classes.button}
-                onClick={saveData}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        )}
-        {submitted == 1 && (
-          <div>
-            <br />
-            <div style={{ fontSize: '17px' }}>
-              {/* <h3> */}
-              Thank you for your contribution. Do you want to upload more data?
-              <br />
-              {/* </h3> */}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <div className={classes.buttons} style={{ marginRight: 10 }}>
+          {uploaded > 0 && !outstanding[0] && submitted == 0 && (
+            <div>
+              <div>Saving {processed.length} files?</div>
+              <div className={classes.buttons}>
                 {/* // TODO: change saveData */}
                 <Button
                   variant='contained'
                   color='primary'
                   className={classes.button}
-                  onClick={() => handleOnClick('/home')}
+                  onClick={saveData}
                 >
-                  Upload more data
-                </Button>
-              </div>
-              <div className={classes.buttons}>
-                {/* // TODO: change saveData */}
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  className={classes.button}
-                  onClick={() => handleOnClick('/home')}
-                >
-                  Go to home page
+                  Save
                 </Button>
               </div>
             </div>
-          </div>
-        )}
-      </React.Fragment>
+          )}
+          {submitted == 1 && (
+            <div>
+              <br />
+              <div style={{ fontSize: '17px' }}>
+                {/* <h3> */}
+                Thank you for your contribution. Do you want to upload more
+                data?
+                <br />
+                {/* </h3> */}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <div className={classes.buttons} style={{ marginRight: 10 }}>
+                  {/* // TODO: change saveData */}
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    className={classes.button}
+                    onClick={() => window.location.reload()}
+                  >
+                    Upload more data
+                  </Button>
+                </div>
+                <div className={classes.buttons}>
+                  {/* // TODO: change saveData */}
+                  <Button
+                    variant='contained'
+                    color='secondary'
+                    className={classes.button}
+                    onClick={() => handleOnClick('/home')}
+                  >
+                    Go to home page
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </React.Fragment>
+      </FadeIn>
     </Paper>
   );
 }

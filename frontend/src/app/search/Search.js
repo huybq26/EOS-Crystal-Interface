@@ -27,6 +27,7 @@ import { useHistory } from 'react-router-dom';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { exportExcelFile } from '../../utils/JsonToExcel';
 import exportJsonFile from '../../utils/JsonExport';
+import FadeIn from 'react-fade-in';
 
 function Search() {
   const classes = useStyles();
@@ -52,7 +53,9 @@ function Search() {
     setSubmitText(textInput.trim());
     setSearchForText(textInput.trim());
     setButtonClicked(true);
+    setPage(0);
     setSearchFirstTime(true);
+
     console.log(textInput);
 
     let arraySearch = [];
@@ -66,7 +69,7 @@ function Search() {
       arraySearch[0] = textInput;
     }
     let url =
-      '/crystal' +
+      '/crystal/' +
       (arraySearch[0]
         ? '?q=' + arraySearch[0].toString().split(' ').join('+')
         : '') +
@@ -168,239 +171,250 @@ function Search() {
 
   return (
     <Paper>
-      <Typography
-        component='h1'
-        variant='h5'
-        align='center'
-        style={{ paddingTop: 30, paddingBottom: 10 }}
-      >
-        Crystal Database Search
-      </Typography>
-      <hr
-        style={{
-          marginLeft: 25,
-          marginRight: 25,
-          color: '#168780',
-        }}
-      ></hr>
-      <Typography
-        style={{
-          paddingLeft: 45,
-          fontSize: 17,
-          marginTop: 10,
-          color: '#168780',
-          marginBottom: 5,
-        }}
-      >
-        <i>
-          Please search with keywords seperated by "and", e.g. Erebus and 1997:
-        </i>
-      </Typography>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          marginLeft: 80,
-          marginTop: 20,
-        }}
-        id='search-input'
-      >
-        <div style={{ width: 400, height: 60 }}>
-          <FormControl fullWidth variant='outlined'>
-            <TextField
-              onChange={handleChange}
-              margin='normal'
-              placeholder=' Search Crystal Database (e.g. Dotsero and 4150)'
-              onKeyDown={handleKeyDown}
-            ></TextField>
-          </FormControl>
-        </div>
-        <div>
-          <IconButton
-            type='submit'
-            className={classes.iconButton}
-            aria-label='search'
-            id='search-button'
-            onClick={handleSubmit}
-          >
-            <SearchIcon fontSize='large' />
-          </IconButton>
-        </div>
-      </div>
-
-      <br></br>
-
-      <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
-        {searchData.length != 0 ? (
-          <Typography>
-            {/* <ul>{items}</ul> */}
-            <Typography
-              component='h3'
-              variant='h5'
-              align='center'
-              style={{ marginBottom: 10 }}
-            >
-              Search results for "{searchForText}":
-            </Typography>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                marginTop: 10,
-                marginRight: 20,
-                marginBottom: 10,
-              }}
-            >
-              <Button
-                onClick={() => exportJsonFile(searchData, 'data_json')}
-                style={{
-                  borderRadius: 35,
-                  backgroundColor: '#21b6ae',
-                  padding: '10px 20px',
-                  fontSize: '15px',
-                }}
-                variant='contained'
-                color='primary'
-              >
-                Export data in JSON
-              </Button>
-              <Button
-                onClick={() => {
-                  excelExport();
-                }}
-                style={{
-                  borderRadius: 35,
-                  backgroundColor: '#34bf24',
-                  padding: '10px 20px',
-                  fontSize: '15px',
-                }}
-                variant='contained'
-                color='primary'
-              >
-                Export data in Excel
-              </Button>
-            </div>
-            <TableContainer className={classes.tableContainer}>
-              <Table stickyHeader aria-label='sticky table'>
-                <TableHead>
-                  <TableRow>
-                    {columns.map((column) => {
-                      return (
-                        <TableCell
-                          key={column.id}
-                          align={column.align}
-                          style={{
-                            minWidth: column.minWidth,
-                            fontWeight: 'bold',
-                            borderColor: 'green',
-                            borderBottomWidth: 3,
-                          }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {searchData
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      return (
-                        <StyledTableRow
-                          hover
-                          role='checkbox'
-                          tabIndex={-1}
-                          key={row.name}
-                        >
-                          {columns.map((column) => {
-                            const value = row[column.id];
-                            return (
-                              <StyledTableCell
-                                key={column.id}
-                                align={column.align}
-                              >
-                                {column.format && typeof value === 'number'
-                                  ? column.format(value)
-                                  : value}
-                              </StyledTableCell>
-                            );
-                          })}
-                        </StyledTableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component='div'
-              count={searchData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
-          </Typography>
-        ) : (
-          // 'No result found.'
-
-          <div>
-            <br></br>
-            {searchFirstTime ? (
-              <div>
-                <Typography
-                  component='h3'
-                  variant='h6'
-                  align='center'
-                  style={{ marginBottom: 10 }}
-                >
-                  No search result found for "{searchForText}".
-                </Typography>
-              </div>
-            ) : (
-              <div>
-                <Typography component='h3' variant='h5' align='center'>
-                  Search results:
-                </Typography>
-              </div>
-            )}
-
-            <br></br>
-
-            <TableContainer className={classes.tableContainer}>
-              <Table stickyHeader aria-label='sticky table'>
-                <TableHead>
-                  <TableRow>
-                    {columns.map((column) => {
-                      return (
-                        <TableCell
-                          key={column.id}
-                          align={column.align}
-                          style={{
-                            minWidth: column.minWidth,
-                            fontWeight: 'bold',
-                            borderColor: 'green',
-                            borderBottomWidth: 3,
-                          }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                </TableHead>
-              </Table>
-            </TableContainer>
-            <br></br>
-
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Loader />
-            </div>
+      <FadeIn>
+        <Typography
+          component='h1'
+          variant='h5'
+          align='center'
+          style={{ paddingTop: 30, paddingBottom: 10 }}
+        >
+          Crystal Database Search
+        </Typography>
+        <hr
+          style={{
+            marginLeft: 25,
+            marginRight: 25,
+            color: '#168780',
+          }}
+        ></hr>
+        <Typography
+          style={{
+            paddingLeft: 45,
+            fontSize: 17,
+            marginTop: 10,
+            color: '#168780',
+            marginBottom: 5,
+          }}
+        >
+          <i>
+            Please search with keywords seperated by "and", e.g. Olivine and
+            Etna:
+          </i>
+        </Typography>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            marginLeft: 80,
+            marginTop: 20,
+          }}
+          id='search-input'
+        >
+          <div style={{ width: 400, height: 60 }}>
+            <FormControl fullWidth variant='outlined'>
+              <TextField
+                onChange={handleChange}
+                margin='normal'
+                placeholder='Search Crystal attributes (e.g. Olivine and Etna)'
+                onKeyDown={handleKeyDown}
+              ></TextField>
+            </FormControl>
           </div>
-        )}
-      </Typography>
+          <div>
+            <IconButton
+              type='submit'
+              className={classes.iconButton}
+              aria-label='search'
+              id='search-button'
+              onClick={handleSubmit}
+            >
+              <SearchIcon fontSize='large' />
+            </IconButton>
+          </div>
+        </div>
+
+        <br></br>
+
+        <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
+          {searchData.length != 0 ? (
+            <Typography>
+              {/* <ul>{items}</ul> */}
+              <Typography
+                component='h3'
+                variant='h5'
+                align='center'
+                style={{ marginBottom: 10 }}
+              >
+                {searchData.length} results found for "{searchForText}":
+              </Typography>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  marginTop: 10,
+                  marginRight: 20,
+                  marginBottom: 10,
+                }}
+              >
+                <Button
+                  onClick={() => exportJsonFile(searchData, 'data_json')}
+                  style={{
+                    borderRadius: 35,
+                    backgroundColor: '#21b6ae',
+                    padding: '10px 20px',
+                    fontSize: '15px',
+                  }}
+                  variant='contained'
+                  color='primary'
+                >
+                  Export data in JSON
+                </Button>
+                <Button
+                  onClick={() => {
+                    excelExport();
+                  }}
+                  style={{
+                    borderRadius: 35,
+                    backgroundColor: '#34bf24',
+                    padding: '10px 20px',
+                    fontSize: '15px',
+                  }}
+                  variant='contained'
+                  color='primary'
+                >
+                  Export data in Excel
+                </Button>
+              </div>
+              <div style={{ marginRight: 15 }}>
+                <TableContainer
+                  className={classes.tableContainer}
+                  style={{ maxHeight: 700 }}
+                >
+                  <Table stickyHeader aria-label='sticky table'>
+                    <TableHead>
+                      <TableRow>
+                        {columns.map((column) => {
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{
+                                minWidth: column.minWidth,
+                                fontWeight: 'bold',
+                                borderColor: 'green',
+                                borderBottomWidth: 3,
+                              }}
+                            >
+                              {column.label}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {searchData
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((row) => {
+                          return (
+                            <StyledTableRow
+                              hover
+                              role='checkbox'
+                              tabIndex={-1}
+                              key={row.name}
+                            >
+                              {columns.map((column) => {
+                                const value = row[column.id];
+                                return (
+                                  <StyledTableCell
+                                    key={column.id}
+                                    align={column.align}
+                                  >
+                                    {column.format && typeof value === 'number'
+                                      ? column.format(value)
+                                      : value}
+                                  </StyledTableCell>
+                                );
+                              })}
+                            </StyledTableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[10, 25, 100]}
+                  component='div'
+                  count={searchData.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                />
+              </div>
+            </Typography>
+          ) : (
+            // 'No result found.'
+
+            <div>
+              <br></br>
+              {searchFirstTime ? (
+                <div>
+                  <Typography
+                    component='h3'
+                    variant='h6'
+                    align='center'
+                    style={{ marginBottom: 10 }}
+                  >
+                    No search result found for "{searchForText}".
+                  </Typography>
+                </div>
+              ) : (
+                <div>
+                  <Typography component='h3' variant='h5' align='center'>
+                    Search results:
+                  </Typography>
+                </div>
+              )}
+
+              <br></br>
+
+              <TableContainer className={classes.tableContainer}>
+                <Table stickyHeader aria-label='sticky table'>
+                  <TableHead>
+                    <TableRow>
+                      {columns.map((column) => {
+                        return (
+                          <TableCell
+                            key={column.id}
+                            align={column.align}
+                            style={{
+                              minWidth: column.minWidth,
+                              fontWeight: 'bold',
+                              borderColor: 'green',
+                              borderBottomWidth: 3,
+                            }}
+                          >
+                            {column.label}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </TableContainer>
+              <br></br>
+
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Loader />
+              </div>
+            </div>
+          )}
+        </Typography>
+      </FadeIn>
     </Paper>
   );
 }

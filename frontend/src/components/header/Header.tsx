@@ -10,13 +10,16 @@ function Header() {
   return (
     <AppBar elevation={0} className={classes.header} position='static'>
       <Toolbar>
-        <Box>
-          <img
-            width='180px'
-            height='80px'
-            src='https://petro.wovodat.org/assets/img/EOS.png'
-          />
-        </Box>
+        <div>
+          <Box>
+            <img
+              width='180px'
+              height='80px'
+              src='https://petro.wovodat.org/assets/img/EOS.png'
+            />
+          </Box>
+        </div>
+
         <Box className={classes.webTitle}>
           <Box>Crystal Workspace and Database</Box>
           <Box>(CWD)</Box>

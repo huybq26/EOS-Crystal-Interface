@@ -25,6 +25,7 @@ import { useHistory } from 'react-router-dom';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
+import FadeIn from 'react-fade-in';
 
 export default function Home() {
   const classes = useStyles();
@@ -46,75 +47,63 @@ export default function Home() {
   };
   return (
     <Paper className={classes.paper}>
-      <Typography component='h1' variant='h4' align='left'>
+      <Typography
+        component='h1'
+        variant='h4'
+        align='left'
+        style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}
+      >
         Introduction
       </Typography>
-      <IconButton aria-label='menu'>
-        <MenuIcon />
-      </IconButton>
-      <TextField
-        onChange={handleChange}
-        name='crystalNameInput'
-        margin='normal'
-        // id='crystal-name'
-        placeholder='SearchDatabase'
-      ></TextField>
 
-      <IconButton
-        type='submit'
-        className={classes.iconButton}
-        aria-label='search'
-      >
-        <SearchIcon onClick={handleSubmit} />
-      </IconButton>
-      <Divider orientation='vertical' />
-      <IconButton
-        color='primary'
-        className={classes.iconButton}
-        aria-label='directions'
-      ></IconButton>
       <Typography className={classes.textDescription}>
-        The Petrology and Workspace Database (PWD) facilitates storing and
-        managing information about petrological data for ready accessibility to
-        researchers. The data management system allows compiling multi-level
-        dataset as images, analyses, results, and time series that can be
-        interactively explored from the work space. The PWD offers three main
-        features:
-        <ul>
-          <li>
-            Users can organize data in work space from field work to analytical
-            techniques by linking the files between them in an interactive work
-            space.
-          </li>
-          <li>
-            Users can share the uploaded data with collaborators (choosing the
-            level of privacy for each project).
-          </li>
-          <li>
-            Users can create an internal database with their collaborators.
-          </li>
-        </ul>
-        The PWD offers two main menus allowing users to input, organize, plot,
-        and query data.
-        <ul>
-          <li>
-            Input: Users can create new projects for adding their data. When
-            creating the project users can choose between different degrees of
-            privacy/sharing. The listed volcanoes and eruptions are according to
-            Smithsonian, but users can add new volcanoes/eruptions. By using the
-            work space and the associated tools users can link multi-level data
-            and produce plots.
-          </li>
-
-          <li>
-            Access Database: Users can find the available data for a specific
-            eruption or volcano. Users can query the data from the map or from
-            one of the three lists: Volcano, Project, and Sample List.
-          </li>
-        </ul>
-        <i>
-          *Users need to be registered to access the database and to upload data
-        </i>
+        <FadeIn>
+          The Crystal and Workspace Database (CWD) facilitates storing and
+          managing information about crystal data for ready accessibility to
+          researchers. The CWD offers three main features:
+          <ul>
+            <li>Users can share the uploaded data with collaborators.</li>
+            <li>
+              Users can contribute crystal data to EOS internal database for
+              future access and use.
+            </li>
+            <li>
+              Users can query and export data from EOS internal database with
+              advanced search (boolean search) or quick search (with keywords
+              separated by "and").
+            </li>
+          </ul>
+        </FadeIn>
+        <FadeIn>
+          The CWD offers three main menus allowing users to input, organize, and
+          query data.
+          <ul>
+            <li>
+              Access Database: Users can find and download the available data
+              based on choices for one or more specific Minerals, Volcanoes,
+              Eruption years, or Type traverses in{' '}
+              <a href='/boolean-search'>advanced search</a> function. Users can
+              query the choices on both typing and clicking.
+            </li>
+            <li>
+              Users can also type, search and download data with keywords
+              separated by "and", i.e. "Erebus and 1997" in{' '}
+              <a href='/quick-search'>quick search</a>.
+            </li>
+            <li>
+              Upload data: Users can create Excel files based on provided
+              template (can be found on <a href='/input'>Upload data</a> page).
+              After that, user can upload multiple Excel files and modify data
+              of each file (if necessary) directly on the web. Successfully
+              uploaded data will be contributed to internal EOS Crystal
+              Database.
+            </li>
+          </ul>
+          <i>
+            Note: Users must log in first to contribute data. However, logging
+            in is not required for searching and downloading data.
+          </i>
+        </FadeIn>
       </Typography>
     </Paper>
   );

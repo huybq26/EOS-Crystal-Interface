@@ -22,6 +22,7 @@ import exportJsonFile from '../../utils/JsonExport';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import Globals from '../../globals';
+import FadeIn from 'react-fade-in';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize='small' />;
 const checkedIcon = <CheckBoxIcon fontSize='small' />;
@@ -56,16 +57,16 @@ function BooleanSearch() {
   const dataRetrieve = async () => {
     const host = Globals().crystalHost;
     try {
-      let mineral = await fetch(host + '/crystal/mineral', {
+      let mineral = await fetch('/crystal/mineral', {
         method: 'GET',
       });
-      let volcano = await fetch(host + '/crystal/volcano', {
+      let volcano = await fetch('/crystal/volcano', {
         method: 'GET',
       });
-      let eruption = await fetch(host + '/crystal/eruption', {
+      let eruption = await fetch('/crystal/eruption', {
         method: 'GET',
       });
-      let type = await fetch(host + '/crystal/type', {
+      let type = await fetch('/crystal/type', {
         method: 'GET',
       });
       setMineralArray(await mineral.json());
@@ -130,6 +131,7 @@ function BooleanSearch() {
     event.preventDefault();
     setSearchFirstTime(true);
     setButtonClicked(true);
+    setPage(0);
 
     let mineralString = '&mineral=';
     let volcanoString = '&volcano=';
@@ -215,356 +217,366 @@ function BooleanSearch() {
 
   return (
     <Paper>
-      <Typography
-        component='h1'
-        variant='h5'
-        align='center'
-        style={{ paddingTop: 30, paddingBottom: 10 }}
-      >
-        Crystal Database Search
-      </Typography>
-      <hr
-        style={{
-          marginLeft: 25,
-          marginRight: 25,
-          color: '#168780',
-        }}
-      ></hr>
-      <Typography
-        style={{
-          paddingLeft: 45,
-          fontSize: 17,
-          marginTop: 10,
-          color: '#168780',
-          marginBottom: 5,
-        }}
-      >
-        <i>
-          Please choose or type in attributes for each property you want to
-          filter out:
-        </i>
-      </Typography>
-      <div className={classes.booleanContainer}>
-        <div className={classes.optionContainer}>
-          <div style={{ width: 500, marginLeft: 30 }}>
-            <Autocomplete
-              multiple
-              limitTags={3}
-              // disableCloseOnSelect
-              options={mineralArray}
-              onChange={onMineralChange}
-              style={{ width: 500 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant='standard'
-                  label='Mineral'
-                  margin='normal'
-                  fullWidth
-                />
-              )}
-              renderOption={(option, { selected }) => (
-                <React.Fragment>
-                  <Checkbox
-                    icon={icon}
-                    checkedIcon={checkedIcon}
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
-                  {option}
-                </React.Fragment>
-              )}
-            />
-          </div>
-        </div>
-        <div className={classes.optionContainer}>
-          <div style={{ width: 500, marginLeft: 30 }}>
-            <Autocomplete
-              multiple
-              limitTags={3}
-              // disableCloseOnSelect
-              options={volcanoArray}
-              onChange={onVolcanoChange}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant='standard'
-                  label='Volcano'
-                  margin='normal'
-                  fullWidth
-                />
-              )}
-              renderOption={(option, { selected }) => (
-                <React.Fragment>
-                  <Checkbox
-                    icon={icon}
-                    checkedIcon={checkedIcon}
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
-                  {option}
-                </React.Fragment>
-              )}
-            />
-          </div>
-        </div>
-        <div className={classes.optionContainer}>
-          <div style={{ width: 500, marginLeft: 30 }}>
-            <Autocomplete
-              multiple
-              limitTags={3}
-              // disableCloseOnSelect
-              options={eruptionArray}
-              onChange={onEruptionChange}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant='standard'
-                  label='Eruption Year'
-                  margin='normal'
-                  fullWidth
-                />
-              )}
-              renderOption={(option, { selected }) => (
-                <React.Fragment>
-                  <Checkbox
-                    icon={icon}
-                    checkedIcon={checkedIcon}
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
-                  {option}
-                </React.Fragment>
-              )}
-            />
-          </div>
-        </div>
-        <div className={classes.optionContainer}>
-          <div style={{ width: 500, marginLeft: 30 }}>
-            <Autocomplete
-              multiple
-              limitTags={3}
-              // disableCloseOnSelect
-              options={typeArray}
-              onChange={onTypeChange}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant='standard'
-                  label='Type traverse'
-                  margin='normal'
-                  fullWidth
-                />
-              )}
-              renderOption={(option, { selected }) => (
-                <React.Fragment>
-                  <Checkbox
-                    icon={icon}
-                    checkedIcon={checkedIcon}
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
-                  {option}
-                </React.Fragment>
-              )}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          marginLeft: 360,
-          marginTop: -15,
-          marginBottom: 30,
-        }}
-      >
-        <Button
-          variant='outlined'
-          color='primary'
-          onClick={handleClear}
-          className={classes.button}
+      <FadeIn>
+        <Typography
+          component='h1'
+          variant='h5'
+          align='center'
+          style={{ paddingTop: 30, paddingBottom: 10 }}
         >
-          Clear all fields
-        </Button>
-        <Button
-          variant='contained'
-          color='primary'
-          onClick={handleSubmit}
-          className={classes.button}
-          id='search-button'
+          Crystal Database Search
+        </Typography>
+        <hr
+          style={{
+            marginLeft: 25,
+            marginRight: 25,
+            color: '#168780',
+          }}
+        ></hr>
+        <Typography
+          style={{
+            paddingLeft: 45,
+            fontSize: 17,
+            marginTop: 10,
+            color: '#168780',
+            marginBottom: 5,
+          }}
         >
-          Search
-        </Button>
-      </div>
-
-      <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
-        {searchData.length != 0 ? (
-          <Typography>
-            <Typography
-              component='h3'
-              variant='h5'
-              align='center'
-              style={{ marginBottom: 10 }}
-            >
-              Search results:
-            </Typography>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                marginTop: 10,
-                marginRight: 20,
-                marginBottom: 10,
-              }}
-            >
-              <Button
-                onClick={() => exportJsonFile(searchData, 'data_json')}
-                style={{
-                  borderRadius: 35,
-                  backgroundColor: '#21b6ae',
-                  padding: '10px 20px',
-                  fontSize: '15px',
-                }}
-                variant='contained'
-                color='primary'
-              >
-                Export data in JSON
-              </Button>
-              <Button
-                onClick={() => excelExport()}
-                style={{
-                  borderRadius: 35,
-                  backgroundColor: '#34bf24',
-                  padding: '10px 20px',
-                  fontSize: '15px',
-                }}
-                variant='contained'
-                color='primary'
-              >
-                Export data in Excel
-              </Button>
+          <i>
+            Please choose or type in attributes for each property you want to
+            filter out:
+          </i>
+        </Typography>
+        <div className={classes.booleanContainer}>
+          <div className={classes.optionContainer}>
+            <div style={{ width: 500, marginLeft: 30 }}>
+              <Autocomplete
+                multiple
+                limitTags={3}
+                // disableCloseOnSelect
+                options={mineralArray}
+                onChange={onMineralChange}
+                style={{ width: 500 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant='standard'
+                    label='Mineral'
+                    margin='normal'
+                    fullWidth
+                  />
+                )}
+                renderOption={(option, { selected }) => (
+                  <React.Fragment>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option}
+                  </React.Fragment>
+                )}
+              />
             </div>
-            <TableContainer className={classes.tableContainer}>
-              <Table stickyHeader aria-label='sticky table'>
-                <TableHead>
-                  <TableRow>
-                    {columns.map((column) => {
-                      return (
-                        <TableCell
-                          key={column.id}
-                          align={column.align}
-                          style={{
-                            minWidth: column.minWidth,
-                            fontWeight: 'bold',
-                            borderColor: 'green',
-                            borderBottomWidth: 3,
-                          }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {searchData
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      return (
-                        <StyledTableRow
-                          hover
-                          role='checkbox'
-                          tabIndex={-1}
-                          key={row.name}
-                        >
-                          {columns.map((column) => {
-                            const value = row[column.id];
-                            return (
-                              <StyledTableCell
-                                key={column.id}
-                                align={column.align}
-                              >
-                                {column.format && typeof value === 'number'
-                                  ? column.format(value)
-                                  : value}
-                              </StyledTableCell>
-                            );
-                          })}
-                        </StyledTableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component='div'
-              count={searchData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
-          </Typography>
-        ) : (
-          // 'No result found.'
-          <div>
-            <br></br>
-            {searchFirstTime ? (
-              <div>
-                <Typography
-                  component='h3'
-                  variant='h6'
-                  align='center'
-                  style={{ marginBottom: 10 }}
+          </div>
+          <div className={classes.optionContainer}>
+            <div style={{ width: 500, marginLeft: 30 }}>
+              <Autocomplete
+                multiple
+                limitTags={3}
+                // disableCloseOnSelect
+                options={volcanoArray}
+                onChange={onVolcanoChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant='standard'
+                    label='Volcano'
+                    margin='normal'
+                    fullWidth
+                  />
+                )}
+                renderOption={(option, { selected }) => (
+                  <React.Fragment>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option}
+                  </React.Fragment>
+                )}
+              />
+            </div>
+          </div>
+          <div className={classes.optionContainer}>
+            <div style={{ width: 500, marginLeft: 30 }}>
+              <Autocomplete
+                multiple
+                limitTags={3}
+                // disableCloseOnSelect
+                options={eruptionArray}
+                onChange={onEruptionChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant='standard'
+                    label='Eruption Year'
+                    margin='normal'
+                    fullWidth
+                  />
+                )}
+                renderOption={(option, { selected }) => (
+                  <React.Fragment>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option}
+                  </React.Fragment>
+                )}
+              />
+            </div>
+          </div>
+          <div className={classes.optionContainer}>
+            <div style={{ width: 500, marginLeft: 30 }}>
+              <Autocomplete
+                multiple
+                limitTags={3}
+                // disableCloseOnSelect
+                options={typeArray}
+                onChange={onTypeChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant='standard'
+                    label='Type traverse'
+                    margin='normal'
+                    fullWidth
+                  />
+                )}
+                renderOption={(option, { selected }) => (
+                  <React.Fragment>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option}
+                  </React.Fragment>
+                )}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            marginLeft: 360,
+            marginTop: -15,
+            marginBottom: 30,
+          }}
+        >
+          <Button
+            variant='outlined'
+            color='primary'
+            onClick={() => window.location.reload()}
+            className={classes.button}
+          >
+            Clear all fields
+          </Button>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={handleSubmit}
+            className={classes.button}
+            id='search-button'
+          >
+            Search
+          </Button>
+        </div>
+
+        <Typography style={{ marginLeft: 25, paddingBottom: 20 }}>
+          {searchData.length != 0 ? (
+            <Typography>
+              <Typography
+                component='h3'
+                variant='h5'
+                align='center'
+                style={{ marginBottom: 10 }}
+              >
+                {searchData.length} results found:
+              </Typography>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  marginTop: 10,
+                  marginRight: 20,
+                  marginBottom: 10,
+                }}
+              >
+                <Button
+                  onClick={() => exportJsonFile(searchData, 'data_json')}
+                  style={{
+                    borderRadius: 35,
+                    backgroundColor: '#21b6ae',
+                    padding: '10px 20px',
+                    fontSize: '15px',
+                  }}
+                  variant='contained'
+                  color='primary'
                 >
-                  No search result found.
-                </Typography>
+                  Export data in JSON
+                </Button>
+                <Button
+                  onClick={() => excelExport()}
+                  style={{
+                    borderRadius: 35,
+                    backgroundColor: '#34bf24',
+                    padding: '10px 20px',
+                    fontSize: '15px',
+                  }}
+                  variant='contained'
+                  color='primary'
+                >
+                  Export data in Excel
+                </Button>
               </div>
-            ) : (
-              <div>
-                <Typography component='h3' variant='h5' align='center'>
-                  Search results:
-                </Typography>
+              <div style={{ marginRight: 15 }}>
+                <TableContainer
+                  className={classes.tableContainer}
+                  style={{ maxHeight: 620 }}
+                >
+                  <Table stickyHeader aria-label='sticky table'>
+                    <TableHead>
+                      <TableRow>
+                        {columns.map((column) => {
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{
+                                minWidth: column.minWidth,
+                                fontWeight: 'bold',
+                                borderColor: 'green',
+                                borderBottomWidth: 3,
+                              }}
+                            >
+                              {column.label}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {searchData
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((row) => {
+                          return (
+                            <StyledTableRow
+                              hover
+                              role='checkbox'
+                              tabIndex={-1}
+                              key={row.name}
+                            >
+                              {columns.map((column) => {
+                                const value = row[column.id];
+                                return (
+                                  <StyledTableCell
+                                    key={column.id}
+                                    align={column.align}
+                                  >
+                                    {column.format && typeof value === 'number'
+                                      ? column.format(value)
+                                      : value}
+                                  </StyledTableCell>
+                                );
+                              })}
+                            </StyledTableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[10, 25, 100]}
+                  component='div'
+                  count={searchData.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                />
               </div>
-            )}
-            <br></br>
-            <TableContainer className={classes.tableContainer}>
-              <Table stickyHeader aria-label='sticky table'>
-                <TableHead>
-                  <TableRow>
-                    {columns.map((column) => {
-                      return (
-                        <TableCell
-                          key={column.id}
-                          align={column.align}
-                          style={{
-                            minWidth: column.minWidth,
-                            fontWeight: 'bold',
-                            borderColor: 'green',
-                            borderBottomWidth: 3,
-                          }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                </TableHead>
-              </Table>
-            </TableContainer>
-            <br></br>
+            </Typography>
+          ) : (
+            // 'No result found.'
+            <div>
+              <br></br>
+              {searchFirstTime ? (
+                <div>
+                  <Typography
+                    component='h3'
+                    variant='h6'
+                    align='center'
+                    style={{ marginBottom: 10 }}
+                  >
+                    No search result found.
+                  </Typography>
+                </div>
+              ) : (
+                <div>
+                  <Typography component='h3' variant='h5' align='center'>
+                    Search results:
+                  </Typography>
+                </div>
+              )}
+              <br></br>
+              <TableContainer className={classes.tableContainer}>
+                <Table stickyHeader aria-label='sticky table'>
+                  <TableHead>
+                    <TableRow>
+                      {columns.map((column) => {
+                        return (
+                          <TableCell
+                            key={column.id}
+                            align={column.align}
+                            style={{
+                              minWidth: column.minWidth,
+                              fontWeight: 'bold',
+                              borderColor: 'green',
+                              borderBottomWidth: 3,
+                            }}
+                          >
+                            {column.label}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </TableContainer>
+              <br></br>
 
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Loader />
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Loader />
+              </div>
             </div>
-          </div>
-        )}
-      </Typography>
+          )}
+        </Typography>
+      </FadeIn>
     </Paper>
   );
 }
